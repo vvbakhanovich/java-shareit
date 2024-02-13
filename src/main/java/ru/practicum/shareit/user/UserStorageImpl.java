@@ -69,6 +69,16 @@ public class UserStorageImpl implements UserStorage {
         }
     }
 
+    @Override
+    public User addItemToUser(final long userId, final long itemId) {
+        if (!users.containsKey(userId)) {
+            throw new NotFoundException("Пользователь с id '" + userId + "' не найден.");
+        }
+        final User user = users.get(userId);
+        user.getItems().add(itemId);
+        return user;
+    }
+
     private boolean checkEmailIsNotUsed(final User user, final String email) {
         if (email == null) {
             return false;

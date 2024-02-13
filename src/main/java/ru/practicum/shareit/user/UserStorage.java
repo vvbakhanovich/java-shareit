@@ -15,4 +15,6 @@ public interface UserStorage {
     List<User> findAll();
 
     void deleteById(long userId);
+
+    User addItemToUser(long userId, long itemId);
 }
