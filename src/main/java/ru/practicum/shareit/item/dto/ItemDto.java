@@ -19,5 +19,5 @@ public class ItemDto {
     @NotBlank(message = "У вещи должно быть описание.")
     private String description;
     @NotNull(message = "У вещи должен быть указан статус доступности.")
-    private boolean available;
+    private Boolean available;
 }
