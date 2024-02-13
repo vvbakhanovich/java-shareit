@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.shared.IdGenerator;
 import ru.practicum.shareit.shared.exception.EmailAlreadyExists;
 import ru.practicum.shareit.shared.exception.NotFoundException;
@@ -70,12 +71,12 @@ public class UserStorageImpl implements UserStorage {
     }
 
     @Override
-    public User addItemToUser(final long userId, final long itemId) {
+    public User addItemToUser(final long userId, final Item item) {
         if (!users.containsKey(userId)) {
             throw new NotFoundException("Пользователь с id '" + userId + "' не найден.");
         }
         final User user = users.get(userId);
-        user.getItems().add(itemId);
+        user.getItems().add(item);
         return user;
     }
 

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.user.storage;
 
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -16,5 +17,5 @@ public interface UserStorage {
 
     void deleteById(long userId);
 
-    User addItemToUser(long userId, long itemId);
+    User addItemToUser(long userId, Item item);
 }
