@@ -14,10 +14,12 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class ItemDto {
     private long id;
-    @NotBlank(message = "У вещи должно быть название.")
+    @NotNull(message = "Имя должно быть обязательно заполнено.")
+    @NotBlank(message = "Название вещи не может быть пустым.")
     private String name;
-    @NotBlank(message = "У вещи должно быть описание.")
+    @NotNull(message = "Описание должно быть обязательно заполнено.")
+    @NotBlank(message = "Описание вещи не может быть пустым.")
     private String description;
-    @NotNull(message = "У вещи должен быть указан статус доступности.")
+    @NotNull(message = "У вещи обязательно должен быть указан статус доступности.")
     private Boolean available;
 }
