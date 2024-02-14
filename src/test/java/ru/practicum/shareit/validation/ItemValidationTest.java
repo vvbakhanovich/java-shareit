@@ -105,7 +105,7 @@ public class ItemValidationTest {
         assertAll(
                 () -> dtoHasErrorMessage(itemDto, "Имя должно быть обязательно заполнено."),
                 () -> dtoHasErrorMessage(itemDto, "Описание должно быть обязательно заполнено."),
-                () ->dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности.")
+                () -> dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности.")
         );
     }
 
