@@ -7,8 +7,10 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.shared.IdGenerator;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,12 +21,16 @@ public class ItemStorageImpl implements ItemStorage {
 
     private final IdGenerator<Long> idGenerator;
     private final Map<Long, Item> items = new HashMap<>();
+    private final Map<Long, List<Item>> userItems = new LinkedHashMap<>();
 
     @Override
-    public Item save(final Item item) {
+    public Item save(final long userId, final Item item) {
         final Long id = idGenerator.generateId();
         item.setId(id);
         items.put(id, item);
+        List<Item> userItemsList = userItems.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
+        userItemsList.add(item);
+        userItems.put(userId, userItemsList);
         return item;
     }
 
@@ -56,9 +62,7 @@ public class ItemStorageImpl implements ItemStorage {
 
     @Override
     public List<Item> findAllByUserId(long userId) {
-        return items.values().stream()
-                .filter(item -> item.getOwner().getId() == userId)
-                .collect(Collectors.toList());
+        return userItems.getOrDefault(userId, new ArrayList<>());
     }
 
     @Override

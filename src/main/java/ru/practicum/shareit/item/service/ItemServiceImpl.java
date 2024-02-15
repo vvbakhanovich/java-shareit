@@ -28,7 +28,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = INSTANCE.toModel(itemDto);
         item.setOwner(owner);
         userStorage.addItemToUser(userId, item);
-        Item addedItem = itemStorage.save(item);
+        Item addedItem = itemStorage.save(userId, item);
         log.info("Пользователь с id '{}' добавил новую вещь: {}.", userId, addedItem);
         return INSTANCE.toDto(addedItem);
     }
