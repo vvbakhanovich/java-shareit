@@ -38,7 +38,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "Имя должно быть обязательно заполнено."));
+        assertTrue(dtoHasErrorMessage(itemDto, "Название вещи не может быть пустым."));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "Описание должно быть обязательно заполнено."));
+        assertTrue(dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."));
     }
 
     @Test
@@ -103,8 +103,8 @@ public class ItemValidationTest {
                 .build();
 
         assertAll(
-                () -> dtoHasErrorMessage(itemDto, "Имя должно быть обязательно заполнено."),
-                () -> dtoHasErrorMessage(itemDto, "Описание должно быть обязательно заполнено."),
+                () -> dtoHasErrorMessage(itemDto, "Название не может быть пустым."),
+                () -> dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."),
                 () -> dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности.")
         );
     }
