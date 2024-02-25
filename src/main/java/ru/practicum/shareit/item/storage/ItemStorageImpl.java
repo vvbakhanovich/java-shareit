@@ -48,6 +48,9 @@ public class ItemStorageImpl implements ItemStorage {
             throw new NotFoundException("Вещь с id '" + itemId + "' не найдена.");
         }
         Item storedItem = items.get(itemId);
+        long ownerId = storedItem.getOwner().getId();
+        List<Item> storedUserItems = userItems.get(ownerId);
+        int index = storedUserItems.indexOf(storedItem);
         if (itemUpdateDto.getName() != null) {
             storedItem.setName(itemUpdateDto.getName());
         }
@@ -57,6 +60,7 @@ public class ItemStorageImpl implements ItemStorage {
         if (itemUpdateDto.getAvailable() != null) {
             storedItem.setAvailable(itemUpdateDto.getAvailable());
         }
+        storedUserItems.set(index, storedItem);
         return storedItem;
     }
 
