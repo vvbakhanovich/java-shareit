@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder
 public class UserDto {
-    private long id;
+    private Long id;
     @NotNull(message = "Имя пользователя обязательно может быть заполнено.")
     @NotBlank(message = "Имя пользователя не может быть пустым.")
     private String name;
