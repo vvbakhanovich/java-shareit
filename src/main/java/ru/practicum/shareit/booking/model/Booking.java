@@ -18,9 +18,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bookings")
@@ -36,22 +36,22 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     @ToString.Exclude
     private Item item;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @ToString.Exclude
-    private User owner;
+    private User booker;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
-    @Column(name = "start_of_loan", nullable = false)
-    private LocalDate startOfLoan;
+    @Column(name = "start_date", nullable = false)
+    private LocalDateTime start;
 
-    @Column(name = "end_of_loan", nullable = false)
-    private LocalDate endOfLoan;
+    @Column(name = "end_date", nullable = false)
+    private LocalDateTime end;
 }
