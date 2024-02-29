@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS bookings (
     item_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
     status VARCHAR(10) NOT NULL,
-    start_of_loan DATE NOT NULL,
-    end_of_loan DATE NOT NULL
+    start_date TIMESTAMP NOT NULL,
+    end_date TIMESTAMP NOT NULL,
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
