@@ -7,11 +7,11 @@ import ru.practicum.shareit.booking.dto.GetBookingState;
 import java.util.List;
 
 public interface BookingService {
-    BookingDto addBooking(long userId, AddBookingDto bookingDto);
+    BookingDto addBooking(Long userId, AddBookingDto bookingDto);
 
-    BookingDto acknowledgeBooking(long userId, Long bookingId, Boolean approved);
+    BookingDto acknowledgeBooking(Long userId, Long bookingId, Boolean approved);
 
-    List<BookingDto> getAllBookingsFromUser(long userId, GetBookingState state);
+    List<BookingDto> getAllBookingsFromUser(Long userId, GetBookingState state);
 
     BookingDto getBookingById(Long userId, Long bookingId);
 

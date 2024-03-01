@@ -39,29 +39,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDto addBooking(long userId, AddBookingDto bookingDto) {
-        User user = findUser(userId);
-        Item item = itemStorage.findById(bookingDto.getItemId())
+    public BookingDto addBooking(final Long userId, final AddBookingDto bookingDto) {
+        final User user = findUser(userId);
+        final Item item = itemStorage.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещь с id '" + bookingDto.getItemId() + "' не найдена."));
         checkItemAvailability(item);
-        Booking booking = Booking.builder()
+        if (item.getOwner().getId() == userId) {
+            throw new NotAuthorizedException("Вещь с id '" + item.getId() +
+                    "' уже принадлежит пользователю с id '" + userId + "'.");
+        }
+        final Booking booking = Booking.builder()
                 .item(item)
                 .booker(user)
                 .status(BookingStatus.WAITING)
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
                 .build();
-        Booking savedBooking = bookingStorage.save(booking);
+        final Booking savedBooking = bookingStorage.save(booking);
         log.info("Пользователь с id '{}' добавил бронирование вещи с id '{}'.", userId, bookingDto.getItemId());
         return bookingMapper.toDto(savedBooking);
     }
 
     @Override
     @Transactional
-    public BookingDto acknowledgeBooking(long userId, Long bookingId, Boolean approved) {
+    public BookingDto acknowledgeBooking(final Long userId, final Long bookingId, final Boolean approved) {
         findUser(userId);
-        Booking booking = findBooking(bookingId);
-        Item item = booking.getItem();
+        final Booking booking = findBooking(bookingId);
+        final Item item = booking.getItem();
         if (item.getOwner().getId() != userId) {
             throw new NotAuthorizedException("Пользователь с id '" + userId +
                     "' не является владельцем вещи с id '" + item.getId() + "'.");
@@ -78,9 +82,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDto getBookingById(Long userId, Long bookingId) {
+    public BookingDto getBookingById(final Long userId, final Long bookingId) {
         findUser(userId);
-        Booking booking = findBooking(bookingId);
+        final Booking booking = findBooking(bookingId);
         if (booking.getBooker().getId().equals(userId) || booking.getItem().getOwner().getId().equals(userId)) {
             return bookingMapper.toDto(booking);
         } else {
@@ -90,43 +94,43 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> getAllOwnerBookings(Long userId, GetBookingState state) {
+    public List<BookingDto> getAllOwnerBookings(final Long userId, final GetBookingState state) {
         findUser(userId);
-        Iterable<Booking> result = new ArrayList<>();
-        BooleanExpression byOwnerId = QBooking.booking.item.owner.id.eq(userId);
-        Sort sortByStartAsc = Sort.by(Sort.Direction.DESC, "start");
-        Iterable<Booking> allOwnerBookings = getAllSortedBookingsFromUser(state, result, byOwnerId, sortByStartAsc);
+        final Iterable<Booking> result = new ArrayList<>();
+        final BooleanExpression byOwnerId = QBooking.booking.item.owner.id.eq(userId);
+        final Sort sortByStartAsc = Sort.by(Sort.Direction.DESC, "start");
+        final Iterable<Booking> allOwnerBookings = getAllSortedBookingsFromUser(state, result, byOwnerId, sortByStartAsc);
         return bookingMapper.toDtoList(Lists.newArrayList(allOwnerBookings));
     }
 
     @Override
-    public List<BookingDto> getAllBookingsFromUser(long userId, GetBookingState state) {
+    public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state) {
         findUser(userId);
         Iterable<Booking> result = new ArrayList<>();
-        Sort sortByStartAsc = Sort.by(Sort.Direction.DESC, "start");
-        BooleanExpression byUserId = QBooking.booking.booker.id.eq(userId);
+        final Sort sortByStartAsc = Sort.by(Sort.Direction.DESC, "start");
+        final BooleanExpression byUserId = QBooking.booking.booker.id.eq(userId);
         result = getAllSortedBookingsFromUser(state, result, byUserId, sortByStartAsc);
         return bookingMapper.toDtoList(Lists.newArrayList(result));
     }
 
-    private User findUser(Long userId) {
+    private User findUser(final Long userId) {
         return userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id '" + userId + "' не найден."));
     }
 
-    private Booking findBooking(Long bookingId) {
+    private Booking findBooking(final Long bookingId) {
         return bookingStorage.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование с id '" + bookingId + "' не найдено."));
     }
 
-    private void checkItemAvailability(Item item) {
+    private void checkItemAvailability(final Item item) {
         if (!item.getAvailable()) {
             throw new ItemUnavailableException("Вещь недоступна для бронирования.");
         }
     }
 
-    private Iterable<Booking> getAllSortedBookingsFromUser(GetBookingState state, Iterable<Booking> result,
-                                                           BooleanExpression byUserId, Sort sortByStartAsc) {
+    private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
+                                                           final BooleanExpression byUserId, final Sort sortByStartAsc) {
         if (GetBookingState.ALL.equals(state)) {
             result = bookingStorage.findAll(byUserId, sortByStartAsc);
         }

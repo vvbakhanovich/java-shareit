@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.mapper;
 
 import org.mapstruct.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
@@ -15,5 +16,7 @@ public interface ItemMapper {
 
     List<ItemDto> toDtoList(List<Item> itemList);
 
-    List<Item> toModelList(List<ItemDto> itemDtoList);
+    ItemWithBookingsDto toWithBookingsDto(Item item);
+
+    List<ItemWithBookingsDto> toWithBookingsDtoList(List<Item> itemList);
 }

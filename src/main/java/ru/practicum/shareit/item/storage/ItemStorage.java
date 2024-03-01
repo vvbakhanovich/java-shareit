@@ -7,5 +7,5 @@ import ru.practicum.shareit.item.model.Item;
 import java.util.List;
 
 public interface ItemStorage extends JpaRepository<Item, Long>, QuerydslPredicateExecutor<Item> {
-    List<Item> findAllByOwnerId(Long userId);
+    List<Item> findAllByOwnerIdOrderById(Long userId);
 }
