@@ -64,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(final Long userId, final Long itemId, final ItemUpdateDto itemUpdateDto) {
         getUser(userId);
         final Item item = getItem(itemId);
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("У пользователя с id '" + userId + "' не найдена вещь с id '" + itemId + "'.");
         }
         if (itemUpdateDto.getName() != null) {
@@ -85,7 +85,7 @@ public class ItemServiceImpl implements ItemService {
         final Item item = getItem(itemId);
         List<Booking> itemBookings = bookingStorage.findAllByItemId(itemId);
         GetItemDto itemWithBookingDatesDto;
-        if (item.getOwner().getId() == userId) {
+        if (item.getOwner().getId().equals(userId)) {
             itemWithBookingDatesDto = getItemWithBookings(item, itemBookings);
         } else {
             itemWithBookingDatesDto = itemMapper.toWithBookingsDto(item);
