@@ -135,14 +135,14 @@ public class BookingServiceImpl implements BookingService {
             result = bookingStorage.findAll(byUserId, sortByStartAsc);
         }
         if (GetBookingState.CURRENT.equals(state)) {
-            BooleanExpression currentBooking = QBooking.booking.end.after(LocalDateTime.now());
-            BooleanExpression isApproved = QBooking.booking.status.eq(BookingStatus.APPROVED);
-            result = bookingStorage.findAll(byUserId.and(currentBooking).and(isApproved),
+            BooleanExpression startBeforeNow = QBooking.booking.start.before(LocalDateTime.now());
+            BooleanExpression endAfterNow = QBooking.booking.end.after(LocalDateTime.now());
+            result = bookingStorage.findAll(byUserId.and(startBeforeNow).and(endAfterNow),
                     sortByStartAsc);
         }
         if (GetBookingState.PAST.equals(state)) {
-            BooleanExpression isRejected = QBooking.booking.status.eq(BookingStatus.REJECTED);
-            result = bookingStorage.findAll(byUserId.and(isRejected), sortByStartAsc);
+            BooleanExpression ended = QBooking.booking.end.before(LocalDateTime.now());
+            result = bookingStorage.findAll(byUserId.and(ended), sortByStartAsc);
         }
         if (GetBookingState.FUTURE.equals(state)) {
             BooleanExpression futureStart = QBooking.booking.start.after(LocalDateTime.now());
