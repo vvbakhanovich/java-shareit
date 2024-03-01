@@ -17,7 +17,7 @@ public class UserValidationTest {
     @ValueSource(strings = {"", " ", "    "})
     public void createUserWithInvalidName(String name) {
         UserDto userDto = UserDto.builder()
-                .id(1)
+                .id(1L)
                 .name(name)
                 .email("email")
                 .build();
@@ -30,7 +30,7 @@ public class UserValidationTest {
     @DisplayName("Проверка невозможности добавить пользователя с неправильно заданным email")
     public void createUserWithInvalidEmail(String email) {
         UserDto userDto = UserDto.builder()
-                .id(1)
+                .id(1L)
                 .name("name")
                 .email(email)
                 .build();
@@ -42,7 +42,7 @@ public class UserValidationTest {
     @DisplayName("Проверка невозможности добавления пользователя, когда name = null")
     public void createUserWithNullName() {
         UserDto userDto = UserDto.builder()
-                .id(1)
+                .id(1L)
                 .name(null)
                 .email("email")
                 .build();
@@ -55,7 +55,7 @@ public class UserValidationTest {
     @DisplayName("Проверка невозможности добавить пользователя с email = null")
     public void createUserWithNullEmail() {
         UserDto userDto = UserDto.builder()
-                .id(1)
+                .id(1L)
                 .name("name")
                 .email(null)
                 .build();
@@ -67,7 +67,7 @@ public class UserValidationTest {
     @DisplayName("Проверка возможности добавить пользователя со всеми валидными полями")
     public void createUserWithAllValidFilms() {
         UserDto userDto = UserDto.builder()
-                .id(1)
+                .id(1L)
                 .name("name")
                 .email("email@test.ru")
                 .build();
@@ -78,7 +78,7 @@ public class UserValidationTest {
     @DisplayName("Проверка невозможности добавить пользователя с несколькими невалидными полями")
     public void createUserWithSeveralInvalidFields() {
         UserDto userDto = UserDto.builder()
-                .id(1)
+                .id(1L)
                 .name("")
                 .email(null)
                 .build();
