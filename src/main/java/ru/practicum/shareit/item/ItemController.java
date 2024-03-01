@@ -14,7 +14,7 @@ import ru.practicum.shareit.item.dto.AddCommentDto;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
-import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.dto.GetItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
@@ -40,17 +40,24 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemWithBookingsDto getItemById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable long itemId) {
+    public GetItemDto getItemById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable long itemId) {
         return itemService.findItemById(userId, itemId);
     }
 
     @GetMapping
-    public List<ItemWithBookingsDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public List<GetItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return itemService.findAllItemsByUserId(userId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
         return itemService.searchItems(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto addCommentToItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                       @PathVariable Long itemId,
+                                       @RequestBody @Valid AddCommentDto commentDto) {
+        return itemService.addCommentToItem(userId, itemId, commentDto);
     }
 }

@@ -10,5 +10,7 @@ import java.util.List;
 public interface BookingStorage extends JpaRepository<Booking, Long>, QuerydslPredicateExecutor<Booking> {
     List<Booking> findAllByItemId(Long itemId);
 
+    List<Booking> findAllByItemIdAndBookerId(Long itemId, Long bookerId);
+
     List<Booking> findAllByItemIdIn(Collection<Long> itemIds);
 }
