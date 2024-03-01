@@ -42,7 +42,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto addItem(final long userId, final ItemDto itemDto) {
+    public ItemDto addItem(final Long userId, final ItemDto itemDto) {
         final User owner = getUser(userId);
         final Item item = itemMapper.toModel(itemDto);
         item.setOwner(owner);
@@ -53,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemDto updateItem(final long userId, final long itemId, final ItemUpdateDto itemUpdateDto) {
+    public ItemDto updateItem(final Long userId, final Long itemId, final ItemUpdateDto itemUpdateDto) {
         getUser(userId);
         final Item item = getItem(itemId);
         if (item.getOwner().getId() != userId) {
@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemWithBookingsDto findItemById(final long userId, final long itemId) {
+    public ItemWithBookingsDto findItemById(final Long userId, final Long itemId) {
         final Item item = getItem(itemId);
         List<Booking> itemBookings = bookingStorage.findAllByItemId(itemId);
         ItemWithBookingsDto itemWithBookingDatesDto;
@@ -87,7 +87,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookingsDto> findAllItemsByUserId(final long userId) {
+    public List<ItemWithBookingsDto> findAllItemsByUserId(final Long userId) {
         userStorage.findById(userId);
         final List<Item> items = itemStorage.findAllByOwnerIdOrderById(userId);
         final List<Long> itemIds = items.stream()
