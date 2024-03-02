@@ -37,6 +37,14 @@ public class BookingServiceImpl implements BookingService {
     private final ItemStorage itemStorage;
     private final BookingMapper bookingMapper;
 
+
+    /**
+     * Добавление нового запроса на бронирование. Запрос может быть создан любым пользователем.
+     *
+     * @param userId     идентификатор пользователя, делающего бронирование
+     * @param bookingDto объект бронирования
+     * @return бронирование с присвоенным идентификатором
+     */
     @Override
     @Transactional
     public BookingDto addBooking(final Long userId, final AddBookingDto bookingDto) {
@@ -60,6 +68,14 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDto(savedBooking);
     }
 
+    /**
+     * Подтверждение или отклонение запроса на бронирование. Может быть выполнено только владельцем вещи.
+     *
+     * @param userId    идентификатор пользователя, делающего подтверждение
+     * @param bookingId идентификатор бронирования
+     * @param approved  подтверждение или отмена бронирования
+     * @return подтвержденное или отмененное бронирование
+     */
     @Override
     @Transactional
     public BookingDto acknowledgeBooking(final Long userId, final Long bookingId, final Boolean approved) {
@@ -81,6 +97,14 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDto(booking);
     }
 
+    /**
+     * Получение бронирования по идентификатору.Может быть выполнено либо автором бронирования, либо владельцем вещи,
+     * к которой относится бронирование.
+     *
+     * @param userId    идентификатор пользователя, делающего запрос
+     * @param bookingId идентификатор бронирования
+     * @return найденное бронирование
+     */
     @Override
     public BookingDto getBookingById(final Long userId, final Long bookingId) {
         findUser(userId);
@@ -93,6 +117,15 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    /**
+     * Получение списка всех бронирований текущего пользователя. Параметр state необязательный и по умолчанию равен ALL.
+     * Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
+     * отсортированными по дате от более новых к более старым.
+     *
+     * @param userId идентификатор пользователя, делающего запрос
+     * @param state  статус бронирования
+     * @return список бронирований
+     */
     @Override
     public List<BookingDto> getAllOwnerBookings(final Long userId, final GetBookingState state) {
         findUser(userId);
@@ -103,6 +136,15 @@ public class BookingServiceImpl implements BookingService {
         return bookingMapper.toDtoList(Lists.newArrayList(allOwnerBookings));
     }
 
+    /**
+     * Получение списка бронирований для всех вещей текущего пользователя. Параметр state необязательный и по умолчанию
+     * равен ALL. Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
+     * отсортированными по дате от более новых к более старым.
+     *
+     * @param userId идентификатор пользователя, делающего запрос
+     * @param state  статус бронирования
+     * @return список бронирований
+     */
     @Override
     public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state) {
         findUser(userId);

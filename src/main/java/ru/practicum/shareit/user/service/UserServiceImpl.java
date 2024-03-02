@@ -21,6 +21,12 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
     private final UserMapper userMapper;
 
+    /**
+     * Добавление нового пользователя.
+     *
+     * @param userDto добавляемый пользователь
+     * @return добавленный пользователь
+     */
     @Override
     @Transactional
     public UserDto addUser(final UserDto userDto) {
@@ -30,6 +36,13 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(addedUser);
     }
 
+    /**
+     * Обновление данных пользователя. Разрешено обновлять имя и электронную почту.
+     *
+     * @param userId        идентификатор пользователя
+     * @param userUpdateDto обновленные данные
+     * @return обновленный пользователь
+     */
     @Override
     @Transactional
     public UserDto updateUser(final long userId, final UserUpdateDto userUpdateDto) {
@@ -46,6 +59,12 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(storedUser);
     }
 
+    /**
+     * Поиск пользователя по идентификатору.
+     *
+     * @param userId идентификатор пользователя
+     * @return найденный пользователь
+     */
     @Override
     public UserDto findUserById(final long userId) {
         final User user = userStorage.findById(userId)
@@ -54,6 +73,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
+    /**
+     * Получение списка всех пользователей.
+     *
+     * @return список всех пользователей
+     */
     @Override
     public List<UserDto> findAllUsers() {
         final List<User> users = userStorage.findAll();
@@ -61,6 +85,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDtoList(users);
     }
 
+    /**
+     * Удаление пользователя по идентификатору.
+     *
+     * @param userId идентификатор пользователя
+     */
     @Override
     public void deleteUserById(final long userId) {
         userStorage.deleteById(userId);

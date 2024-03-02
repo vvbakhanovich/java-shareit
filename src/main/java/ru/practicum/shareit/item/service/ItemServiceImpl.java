@@ -48,6 +48,13 @@ public class ItemServiceImpl implements ItemService {
     private final BookingMapper bookingMapper;
     private final CommentMapper commentMapper;
 
+    /**
+     * Добавление новой вещи.
+     *
+     * @param userId  идентификатор пользователя, добавляющего вещь
+     * @param itemDto добавляемая вещь
+     * @return добавленная вещь
+     */
     @Override
     @Transactional
     public ItemDto addItem(final Long userId, final ItemDto itemDto) {
@@ -59,6 +66,15 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toDto(addedItem);
     }
 
+    /**
+     * Редактирование вещи. Параметры вещи, допустимые к обновлению: название, описание и статус. Обновлять данные
+     * может только владелец вещи.
+     *
+     * @param userId        идентификатор пользователя, делающего запрос
+     * @param itemId        идентификатор обновляемой вещи
+     * @param itemUpdateDto параметры для обновления
+     * @return вещь с обновленными параметрами
+     */
     @Override
     @Transactional
     public ItemDto updateItem(final Long userId, final Long itemId, final ItemUpdateDto itemUpdateDto) {
@@ -80,6 +96,14 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toDto(updatedItem);
     }
 
+    /**
+     * Получение вещи по ее идентификатору. Если запрос делает владелец вещи, то он также видит даты ближайшего и
+     * последнего бронирования.
+     *
+     * @param userId идентификатор пользователя, делающего запрос
+     * @param itemId идентификатор запрашиваемой вещи
+     * @return запрошенная вещь
+     */
     @Override
     public GetItemDto findItemById(final Long userId, final Long itemId) {
         final Item item = getItem(itemId);
@@ -96,6 +120,12 @@ public class ItemServiceImpl implements ItemService {
         return itemWithBookingDatesDto;
     }
 
+    /**
+     * Просмотр владельцем списка всех его вещей.
+     *
+     * @param userId идентификатор пользователя, делающего запрос
+     * @return список вещей пользователя
+     */
     @Override
     public List<GetItemDto> findAllItemsByUserId(final Long userId) {
         userStorage.findById(userId);
@@ -110,6 +140,13 @@ public class ItemServiceImpl implements ItemService {
         return itemsWithBookings;
     }
 
+    /**
+     * Поиск вещи потенциальным арендатором. Пользователь передаёт в строке запроса текст, и система ищет вещи,
+     * содержащие этот текст в названии или описании. Регистр текста не учитывается.
+     *
+     * @param text текстовый запрос
+     * @return список вещей, соответсвующих запросу
+     */
     @Override
     public List<ItemDto> searchItems(final String text) {
         log.info("Поиск вещей по запросу: {}.", text);
@@ -123,6 +160,14 @@ public class ItemServiceImpl implements ItemService {
         return itemMapper.toDtoList(Lists.newArrayList(searchResult));
     }
 
+    /**
+     * Добавление комментария о вещи после окончания аренды.
+     *
+     * @param userId     идентификатор пользователя, желающего оставить комментарий
+     * @param itemId     идентификатор вещи
+     * @param commentDto комментарий
+     * @return добавленный комментарий
+     */
     @Override
     @Transactional
     public CommentDto addCommentToItem(final Long userId, final Long itemId, final AddCommentDto commentDto) {
