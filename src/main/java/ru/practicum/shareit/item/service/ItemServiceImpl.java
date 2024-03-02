@@ -124,6 +124,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto addCommentToItem(final Long userId, final Long itemId, final AddCommentDto commentDto) {
         final User user = getUser(userId);
         final Item item = getItem(itemId);
@@ -169,14 +170,10 @@ public class ItemServiceImpl implements ItemService {
                 .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()) &&
                         booking.getStatus().equals(BookingStatus.APPROVED))
                 .max(Comparator.comparing(Booking::getEnd));
-        return GetItemDto.builder()
-                .id(item.getId())
-                .name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .lastBooking(bookingMapper.toShortDto(lastBooking.orElse(null)))
-                .nextBooking(bookingMapper.toShortDto(closestBooking.orElse(null)))
-                .build();
+        return itemMapper.toGetItemDto(item,
+                bookingMapper.toShortDto(lastBooking.orElse(null)),
+                bookingMapper.toShortDto(closestBooking.orElse(null)));
+
     }
 
     private void checkIfUserCanAddComments(Long userId, Long itemId, List<Booking> bookings) {
