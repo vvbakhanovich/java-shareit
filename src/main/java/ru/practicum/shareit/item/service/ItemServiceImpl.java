@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,16 +8,11 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingStorage;
-import ru.practicum.shareit.item.dto.AddCommentDto;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.GetItemDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.model.QItem;
 import ru.practicum.shareit.item.storage.CommentStorage;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
@@ -28,12 +22,7 @@ import ru.practicum.shareit.user.storage.UserStorage;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -153,10 +142,11 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        final BooleanExpression nameContains = QItem.item.name.containsIgnoreCase(text);
-        final BooleanExpression descriptionContains = QItem.item.description.containsIgnoreCase(text);
-        final BooleanExpression isAvailable = QItem.item.available.eq(true);
-        final Iterable<Item> searchResult = itemStorage.findAll(nameContains.or(descriptionContains).and(isAvailable));
+//        final BooleanExpression nameContains = QItem.item.name.containsIgnoreCase(text);
+//        final BooleanExpression descriptionContains = QItem.item.description.containsIgnoreCase(text);
+//        final BooleanExpression isAvailable = QItem.item.available.eq(true);
+        String searchText = "%" + text.toLowerCase() + "%";
+        final Iterable<Item> searchResult = itemStorage.findAllByNameOrDescriptionContainingIgnoreCase(searchText);
         return itemMapper.toDtoList(Lists.newArrayList(searchResult));
     }
 
