@@ -1,10 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import com.google.common.collect.Lists;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.AddBookingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -12,7 +10,6 @@ import ru.practicum.shareit.booking.dto.GetBookingState;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.booking.model.QBooking;
 import ru.practicum.shareit.booking.storage.BookingStorage;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
@@ -130,9 +127,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllOwnerBookings(final Long userId, final GetBookingState state) {
         findUser(userId);
         final Iterable<Booking> result = new ArrayList<>();
-        final BooleanExpression byOwnerId = QBooking.booking.item.owner.id.eq(userId);
-        final Sort sortByStartAsc = Sort.by(Sort.Direction.DESC, "start");
-        final Iterable<Booking> allOwnerBookings = getAllSortedBookingsFromUser(state, result, byOwnerId, sortByStartAsc);
+        final Iterable<Booking> allOwnerBookings = getAllSortedBookingsFromUser(state, result, userId);
         return bookingMapper.toDtoList(Lists.newArrayList(allOwnerBookings));
     }
 
@@ -149,9 +144,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state) {
         findUser(userId);
         Iterable<Booking> result = new ArrayList<>();
-        final Sort sortByStartAsc = Sort.by(Sort.Direction.DESC, "start");
-        final BooleanExpression byUserId = QBooking.booking.booker.id.eq(userId);
-        result = getAllSortedBookingsFromUser(state, result, byUserId, sortByStartAsc);
+        result = getAllSortedBookingsFromBooker(state, result, userId);
         return bookingMapper.toDtoList(Lists.newArrayList(result));
     }
 
@@ -171,32 +164,55 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    /*
+        Изначально сделал через query dsl, получилось лаконично и красиво. Но в процессе дебага увидел, что findAll()
+        выгружает данные через N+1. Поэтому пришлось плодить подобные методы, но зато появился контроль за выгрузкой.
+        Может есть способ сделать это более красиво?
+     */
     private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
-                                                           final BooleanExpression byUserId, final Sort sortByStartAsc) {
+                                                           final Long userId) {
         if (GetBookingState.ALL.equals(state)) {
-            result = bookingStorage.findAll(byUserId, sortByStartAsc);
+            result = bookingStorage.findAllByItemOwnerIdOrderByStartDesc(userId);
         }
         if (GetBookingState.CURRENT.equals(state)) {
-            BooleanExpression startBeforeNow = QBooking.booking.start.before(LocalDateTime.now());
-            BooleanExpression endAfterNow = QBooking.booking.end.after(LocalDateTime.now());
-            result = bookingStorage.findAll(byUserId.and(startBeforeNow).and(endAfterNow),
-                    sortByStartAsc);
+            result = bookingStorage.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, LocalDateTime.now(),
+                    LocalDateTime.now());
         }
         if (GetBookingState.PAST.equals(state)) {
-            BooleanExpression ended = QBooking.booking.end.before(LocalDateTime.now());
-            result = bookingStorage.findAll(byUserId.and(ended), sortByStartAsc);
+            result = bookingStorage.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
         }
         if (GetBookingState.FUTURE.equals(state)) {
-            BooleanExpression futureStart = QBooking.booking.start.after(LocalDateTime.now());
-            result = bookingStorage.findAll(byUserId.and(futureStart), sortByStartAsc);
+            result = bookingStorage.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
         }
         if (GetBookingState.WAITING.equals(state)) {
-            BooleanExpression waitingStatus = QBooking.booking.status.eq(BookingStatus.WAITING);
-            result = bookingStorage.findAll(byUserId.and(waitingStatus), sortByStartAsc);
+            result = bookingStorage.findByItemOwnerIdAndStatus(userId, BookingStatus.WAITING);
         }
         if (GetBookingState.REJECTED.equals(state)) {
-            BooleanExpression rejectedStatus = QBooking.booking.status.eq(BookingStatus.REJECTED);
-            result = bookingStorage.findAll(byUserId.and(rejectedStatus), sortByStartAsc);
+            result = bookingStorage.findByItemOwnerIdAndStatus(userId, BookingStatus.REJECTED);
+        }
+        return result;
+    }
+
+    private Iterable<Booking> getAllSortedBookingsFromBooker(final GetBookingState state, Iterable<Booking> result,
+                                                             final Long bookerId) {
+        if (GetBookingState.ALL.equals(state)) {
+            result = bookingStorage.findAllByBookerIdOrderByStartDesc(bookerId);
+        }
+        if (GetBookingState.CURRENT.equals(state)) {
+            result = bookingStorage.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(bookerId, LocalDateTime.now(),
+                    LocalDateTime.now());
+        }
+        if (GetBookingState.PAST.equals(state)) {
+            result = bookingStorage.findAllByBookerIdAndEndBeforeOrderByStartDesc(bookerId, LocalDateTime.now());
+        }
+        if (GetBookingState.FUTURE.equals(state)) {
+            result = bookingStorage.findAllByBookerIdAndStartAfterOrderByStartDesc(bookerId, LocalDateTime.now());
+        }
+        if (GetBookingState.WAITING.equals(state)) {
+            result = bookingStorage.findByBookerIdAndStatus(bookerId, BookingStatus.WAITING);
+        }
+        if (GetBookingState.REJECTED.equals(state)) {
+            result = bookingStorage.findByBookerIdAndStatus(bookerId, BookingStatus.REJECTED);
         }
         return result;
     }
