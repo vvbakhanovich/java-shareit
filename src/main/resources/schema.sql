@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS items (
     item_name VARCHAR(255) NOT NULL,
     description VARCHAR(255) NOT NULL,
     available BOOLEAN NOT NULL,
-    owner_id BIGINT NOT NULL
+    owner_id BIGINT NOT NULL,
+    FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS bookings (
