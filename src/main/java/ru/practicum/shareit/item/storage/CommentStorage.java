@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface CommentStorage extends JpaRepository<Comment, Long> {
+    @Query("SELECT c FROM Comment c JOIN FETCH c.item i JOIN FETCH c.author u WHERE i.id = ?1")
     List<Comment> findAllByItemId(Long itemId);
 
     @Query("SELECT c FROM Comment c JOIN FETCH c.item i JOIN FETCH c.author u WHERE i.id IN ?1")
