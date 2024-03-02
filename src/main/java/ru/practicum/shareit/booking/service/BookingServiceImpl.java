@@ -167,7 +167,8 @@ public class BookingServiceImpl implements BookingService {
     /*
         Изначально сделал через query dsl, получилось лаконично и красиво. Но в процессе дебага увидел, что findAll()
         выгружает данные через N+1. Поэтому пришлось плодить подобные методы, но зато появился контроль за выгрузкой.
-        Может есть способ сделать это более красиво?
+        Может есть способ сделать это более красиво? Еще, как оказалось, тесты на gitHub не пропускают вариант с queryDsl
+        так как папка generated-sources не помечена как generated source folder и классы QBooking и подобные не видятся
      */
     private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
                                                            final Long userId) {
