@@ -44,7 +44,7 @@ public class BookingServiceImpl implements BookingService {
         final Item item = itemStorage.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Вещь с id '" + bookingDto.getItemId() + "' не найдена."));
         checkItemAvailability(item);
-        if (item.getOwner().getId() == userId) {
+        if (item.getOwner().getId().equals(userId)) {
             throw new NotAuthorizedException("Вещь с id '" + item.getId() +
                     "' уже принадлежит пользователю с id '" + userId + "'.");
         }
@@ -66,7 +66,7 @@ public class BookingServiceImpl implements BookingService {
         findUser(userId);
         final Booking booking = findBooking(bookingId);
         final Item item = booking.getItem();
-        if (item.getOwner().getId() != userId) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new NotAuthorizedException("Пользователь с id '" + userId +
                     "' не является владельцем вещи с id '" + item.getId() + "'.");
         }
