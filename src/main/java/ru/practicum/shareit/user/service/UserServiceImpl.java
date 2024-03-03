@@ -3,12 +3,14 @@ package ru.practicum.shareit.user.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -19,7 +21,14 @@ public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
     private final UserMapper userMapper;
 
+    /**
+     * Добавление нового пользователя.
+     *
+     * @param userDto добавляемый пользователь
+     * @return добавленный пользователь
+     */
     @Override
+    @Transactional
     public UserDto addUser(final UserDto userDto) {
         final User user = userMapper.toModel(userDto);
         final User addedUser = userStorage.save(user);
@@ -27,20 +36,48 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(addedUser);
     }
 
+    /**
+     * Обновление данных пользователя. Разрешено обновлять имя и электронную почту.
+     *
+     * @param userId        идентификатор пользователя
+     * @param userUpdateDto обновленные данные
+     * @return обновленный пользователь
+     */
     @Override
+    @Transactional
     public UserDto updateUser(final long userId, final UserUpdateDto userUpdateDto) {
-        final User updatedUserFromDb = userStorage.update(userId, userUpdateDto);
+        User storedUser = userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id '" + userId + "' не найден."));
+        if (userUpdateDto.getName() != null) {
+            storedUser.setName(userUpdateDto.getName());
+        }
+        if (userUpdateDto.getEmail() != null) {
+            storedUser.setEmail(userUpdateDto.getEmail());
+        }
         log.info("Обновление пользователя с id '{}'.", userId);
-        return userMapper.toDto(updatedUserFromDb);
+        userStorage.save(storedUser);
+        return userMapper.toDto(storedUser);
     }
 
+    /**
+     * Поиск пользователя по идентификатору.
+     *
+     * @param userId идентификатор пользователя
+     * @return найденный пользователь
+     */
     @Override
     public UserDto findUserById(final long userId) {
-        final User user = userStorage.findById(userId);
+        final User user = userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id '" + userId + "' не найден."));
         log.info("Получение пользователя с id '{}.", userId);
         return userMapper.toDto(user);
     }
 
+    /**
+     * Получение списка всех пользователей.
+     *
+     * @return список всех пользователей
+     */
     @Override
     public List<UserDto> findAllUsers() {
         final List<User> users = userStorage.findAll();
@@ -48,6 +85,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDtoList(users);
     }
 
+    /**
+     * Удаление пользователя по идентификатору.
+     *
+     * @param userId идентификатор пользователя
+     */
     @Override
     public void deleteUserById(final long userId) {
         userStorage.deleteById(userId);

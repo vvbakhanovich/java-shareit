@@ -19,7 +19,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка невозможности добавить вещь с пустым названием.")
     public void createItemWithEmptyName(String name) {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name(name)
                 .description("description")
                 .available(true)
@@ -32,7 +32,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка невозможности добавить вещь, если имя = null")
     public void createItemWithNullName() {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name(null)
                 .description("description")
                 .available(true)
@@ -45,7 +45,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка возможности добавить вещь с валидным названием")
     public void createItemWithValidName() {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name("item")
                 .description("description")
                 .available(true)
@@ -59,7 +59,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка невозможности добавить вещь с пустым описанием.")
     public void createItemWithEmptyDescription(String description) {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name("name")
                 .description(description)
                 .available(true)
@@ -72,7 +72,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка невозможности добавить вещь, если описание = null")
     public void createItemWithNullDescription() {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name("name")
                 .description(null)
                 .available(true)
@@ -85,7 +85,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка невозможности добавить вещь, когда статус доступности = null")
     public void createItemWithNullAvailability() {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name("name")
                 .description("description")
                 .build();
@@ -97,7 +97,7 @@ public class ItemValidationTest {
     @DisplayName("Проверка невозможности добавить вещь с несколькими невалидным полями.")
     public void createItemWithSeveralInvalidFields() {
         ItemDto itemDto = ItemDto.builder()
-                .id(1)
+                .id(1L)
                 .name("")
                 .description(null)
                 .build();
