@@ -142,9 +142,6 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-//        final BooleanExpression nameContains = QItem.item.name.containsIgnoreCase(text);
-//        final BooleanExpression descriptionContains = QItem.item.description.containsIgnoreCase(text);
-//        final BooleanExpression isAvailable = QItem.item.available.eq(true);
         String searchText = "%" + text.toLowerCase() + "%";
         final Iterable<Item> searchResult = itemStorage.findAllByNameOrDescriptionContainingIgnoreCase(searchText);
         return itemMapper.toDtoList(Lists.newArrayList(searchResult));
