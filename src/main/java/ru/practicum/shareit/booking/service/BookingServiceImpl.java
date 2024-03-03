@@ -154,7 +154,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Booking findBooking(final Long bookingId) {
-        return bookingStorage.findById(bookingId)
+        return bookingStorage.findBookingById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Бронирование с id '" + bookingId + "' не найдено."));
     }
 
@@ -164,56 +164,52 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    /*
-        Изначально сделал через query dsl, получилось лаконично и красиво. Но в процессе дебага увидел, что findAll()
-        выгружает данные через N+1. Поэтому пришлось плодить подобные методы, но зато появился контроль за выгрузкой.
-        Может есть способ сделать это более красиво? Еще, как оказалось, тесты на gitHub не пропускают вариант с queryDsl
-        так как папка generated-sources не помечена как generated source folder и классы QBooking и подобные не видятся
-     */
     private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
                                                            final Long userId) {
-        if (GetBookingState.ALL.equals(state)) {
-            result = bookingStorage.findAllByItemOwnerIdOrderByStartDesc(userId);
-        }
-        if (GetBookingState.CURRENT.equals(state)) {
-            result = bookingStorage.findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, LocalDateTime.now(),
-                    LocalDateTime.now());
-        }
-        if (GetBookingState.PAST.equals(state)) {
-            result = bookingStorage.findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(userId, LocalDateTime.now());
-        }
-        if (GetBookingState.FUTURE.equals(state)) {
-            result = bookingStorage.findAllByItemOwnerIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now());
-        }
-        if (GetBookingState.WAITING.equals(state)) {
-            result = bookingStorage.findByItemOwnerIdAndStatus(userId, BookingStatus.WAITING);
-        }
-        if (GetBookingState.REJECTED.equals(state)) {
-            result = bookingStorage.findByItemOwnerIdAndStatus(userId, BookingStatus.REJECTED);
+        switch (state) {
+            case ALL:
+                result = bookingStorage.findAllByItemOwnerId(userId);
+                break;
+            case CURRENT:
+                result = bookingStorage.findCurrentBookingsByOwnerId(userId, LocalDateTime.now(), LocalDateTime.now());
+                break;
+            case PAST:
+                result = bookingStorage.findPastBookingsByOwnerId(userId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                result = bookingStorage.findFutureBookingsByOwnerId(userId, LocalDateTime.now());
+                break;
+            case WAITING:
+                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED);
+                break;
         }
         return result;
     }
 
     private Iterable<Booking> getAllSortedBookingsFromBooker(final GetBookingState state, Iterable<Booking> result,
                                                              final Long bookerId) {
-        if (GetBookingState.ALL.equals(state)) {
-            result = bookingStorage.findAllByBookerIdOrderByStartDesc(bookerId);
-        }
-        if (GetBookingState.CURRENT.equals(state)) {
-            result = bookingStorage.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(bookerId, LocalDateTime.now(),
-                    LocalDateTime.now());
-        }
-        if (GetBookingState.PAST.equals(state)) {
-            result = bookingStorage.findAllByBookerIdAndEndBeforeOrderByStartDesc(bookerId, LocalDateTime.now());
-        }
-        if (GetBookingState.FUTURE.equals(state)) {
-            result = bookingStorage.findAllByBookerIdAndStartAfterOrderByStartDesc(bookerId, LocalDateTime.now());
-        }
-        if (GetBookingState.WAITING.equals(state)) {
-            result = bookingStorage.findByBookerIdAndStatus(bookerId, BookingStatus.WAITING);
-        }
-        if (GetBookingState.REJECTED.equals(state)) {
-            result = bookingStorage.findByBookerIdAndStatus(bookerId, BookingStatus.REJECTED);
+        switch (state) {
+            case ALL:
+                result = bookingStorage.findAllByBookerId(bookerId);
+                break;
+            case CURRENT:
+                result = bookingStorage.findCurrentBookingsByBookerId(bookerId, LocalDateTime.now(), LocalDateTime.now());
+                break;
+            case PAST:
+                result = bookingStorage.findPastBookingsByBookerId(bookerId, LocalDateTime.now());
+                break;
+            case FUTURE:
+                result = bookingStorage.findFutureBookingsByBookerId(bookerId, LocalDateTime.now());
+                break;
+            case WAITING:
+                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.WAITING);
+                break;
+            case REJECTED:
+                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.REJECTED);
+                break;
         }
         return result;
     }

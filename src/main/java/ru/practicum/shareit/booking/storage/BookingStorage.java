@@ -25,34 +25,34 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemIdIn(Collection<Long> itemIds);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.item.owner.id = ?1 ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findAllByItemOwnerId(Long ownerId);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.start <= ?2 AND b.end >= ?3 ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long ownerId, LocalDateTime startBefore,
-                                                                                LocalDateTime endAfter);
+    List<Booking> findCurrentBookingsByOwnerId(Long ownerId, LocalDateTime startBefore,
+                                               LocalDateTime endAfter);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.end <= ?2 ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdAndEndBeforeOrderByStartDesc(Long ownerId, LocalDateTime endBefore);
+    List<Booking> findPastBookingsByOwnerId(Long ownerId, LocalDateTime endBefore);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.start >= ?2 ORDER BY b.start DESC")
-    List<Booking> findAllByItemOwnerIdAndStartAfterOrderByStartDesc(Long ownerId, LocalDateTime startAfter);
+    List<Booking> findFutureBookingsByOwnerId(Long ownerId, LocalDateTime startAfter);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.status = ?2")
-    List<Booking> findByItemOwnerIdAndStatus(Long ownerId, BookingStatus status);
+    List<Booking> findBookingsByOwnerIdAndStatus(Long ownerId, BookingStatus status);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.booker.id = ?1 ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdOrderByStartDesc(Long ownerId);
+    List<Booking> findAllByBookerId(Long bookerId);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.booker.id = ?1 AND b.start <= ?2 AND b.end >= ?3 ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long ownerId, LocalDateTime startBefore,
-                                                                                LocalDateTime endAfter);
+    List<Booking> findCurrentBookingsByBookerId(Long ownerId, LocalDateTime startBefore,
+                                                LocalDateTime endAfter);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.booker.id = ?1 AND b.end <= ?2 ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdAndEndBeforeOrderByStartDesc(Long ownerId, LocalDateTime endBefore);
+    List<Booking> findPastBookingsByBookerId(Long ownerId, LocalDateTime endBefore);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.booker.id = ?1 AND b.start >= ?2 ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdAndStartAfterOrderByStartDesc(Long ownerId, LocalDateTime startAfter);
+    List<Booking> findFutureBookingsByBookerId(Long ownerId, LocalDateTime startAfter);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.booker.id = ?1 AND b.status = ?2")
-    List<Booking> findByBookerIdAndStatus(Long ownerId, BookingStatus status);
+    List<Booking> findBookingsByBookerIdAndStatus(Long ownerId, BookingStatus status);
 }
