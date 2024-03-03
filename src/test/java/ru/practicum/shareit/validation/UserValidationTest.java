@@ -47,8 +47,7 @@ public class UserValidationTest {
                 .email("email")
                 .build();
 
-        assertTrue(dtoHasErrorMessage(userDto, "Имя пользователя обязательно может быть заполнено."));
-
+        assertTrue(dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."));
     }
 
     @Test
