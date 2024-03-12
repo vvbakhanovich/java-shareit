@@ -55,7 +55,7 @@ public class ApplicationExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorMessage handleConversionFailedException(MethodArgumentTypeMismatchException e) {
-        ErrorMessage errorMessage = new ErrorMessage("Unknown state: UNSUPPORTED_STATUS");
+        ErrorMessage errorMessage = new ErrorMessage("Unknown state: " + e.getValue());
         log.error(e.getLocalizedMessage());
         return errorMessage;
     }
