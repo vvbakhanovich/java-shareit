@@ -15,6 +15,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentStorage;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.ItemRequestStorage;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -33,6 +35,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
     private final BookingStorage bookingStorage;
     private final CommentStorage commentStorage;
+    private final ItemRequestStorage itemRequestStorage;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
     private final CommentMapper commentMapper;
@@ -50,6 +53,7 @@ public class ItemServiceImpl implements ItemService {
         final User owner = getUser(userId);
         final Item item = itemMapper.toModel(itemDto);
         item.setOwner(owner);
+        assignRequestToItem(itemDto, item);
         final Item addedItem = itemStorage.save(item);
         log.info("Пользователь с id '{}' добавил новую вещь c id '{}'.", userId, addedItem.getId());
         return itemMapper.toDto(addedItem);
@@ -226,5 +230,14 @@ public class ItemServiceImpl implements ItemService {
     private Item getItem(final long itemId) {
         return itemStorage.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id '" + itemId + "' не найдена."));
+    }
+
+    private void assignRequestToItem(ItemDto itemDto, Item item) {
+        Long requestId = itemDto.getRequestId();
+        if (requestId != null && requestId > 0) {
+            ItemRequest itemRequest = itemRequestStorage.findById(requestId)
+                    .orElseThrow(() -> new NotFoundException("Запрос с id '" + requestId + "' не найден."));
+            item.setRequest(itemRequest);
+        }
     }
 }
