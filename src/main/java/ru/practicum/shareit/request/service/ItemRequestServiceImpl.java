@@ -44,8 +44,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAllItemRequests(Long userId, long from, int size) {
+    public List<ItemRequestDto> getAllItemRequests(Long userId, Long from, Integer size) {
         findUser(userId);
+        if (from == null && size == null) {
+            return itemRequestMapper.toDtoList(itemRequestStorage.findAll());
+        }
         OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
         Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest);
         log.info("Получение списка запросов, начиная с '{}', по '{}' элемента на странице.", from, size);
