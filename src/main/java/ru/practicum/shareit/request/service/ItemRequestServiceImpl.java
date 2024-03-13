@@ -50,7 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             return itemRequestMapper.toDtoList(itemRequestStorage.findAll());
         }
         OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
-        Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(userId, pageRequest);
+        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(userId, pageRequest);
         log.info("Получение списка запросов, начиная с '{}', по '{}' элемента на странице.", from, size);
         return itemRequestMapper.toDtoList(requests.getContent());
     }

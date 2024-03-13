@@ -106,7 +106,7 @@ class ItemRequestStorageTest {
     public void findAllByOrderByCreatedDesc_From0Size1_ShouldReturnListOfItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 1);
 
-        Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(savedUser1.getId(),
+        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
         assertThat(requests.getContent(), is(List.of(savedRequest3)));
@@ -118,7 +118,7 @@ class ItemRequestStorageTest {
     public void findAllByOrderByCreatedDesc_From0Size10_ShouldReturnListOfTwoItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 10);
 
-        Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(savedUser1.getId(),
+        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
         assertThat(requests.getContent(), is(List.of(savedRequest3, savedRequest2)));
@@ -129,7 +129,7 @@ class ItemRequestStorageTest {
     public void findAllByOrderByCreatedDesc_From0Size0_ShouldReturnEmptyList() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 0);
 
-        Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(savedUser1.getId(),
+        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
         assertThat(requests.getContent(), is(Collections.emptyList()));
@@ -140,7 +140,7 @@ class ItemRequestStorageTest {
     public void findAllByOrderByCreatedDesc_From1Size1_ShouldReturnListOfItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(1, 1);
 
-        Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(savedUser1.getId(),
+        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
         assertThat(requests.getContent(), is(List.of(savedRequest2)));
@@ -151,7 +151,7 @@ class ItemRequestStorageTest {
     public void findAllByOrderByCreatedDesc_From1Size1_ShouldReturnAllItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 2);
 
-        Page<ItemRequest> requests = itemRequestStorage.findAllByRequesterIdNotOrderByCreatedDesc(savedUser1.getId(),
+        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
         assertThat(requests.getContent(), is(List.of(savedRequest3, savedRequest2)));
