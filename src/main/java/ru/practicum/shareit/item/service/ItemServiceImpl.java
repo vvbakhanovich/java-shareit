@@ -237,7 +237,7 @@ public class ItemServiceImpl implements ItemService {
         if (requestId != null && requestId > 0) {
             ItemRequest itemRequest = itemRequestStorage.findById(requestId)
                     .orElseThrow(() -> new NotFoundException("Запрос с id '" + requestId + "' не найден."));
-            item.setRequest(itemRequest);
+            itemRequest.addItem(item);
         }
     }
 }

@@ -53,6 +53,7 @@ public class ItemRequest {
 
     public void addItem(Item item) {
         items.add(item);
+        item.setRequest(this);
     }
 
     @Override
