@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +37,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ItemRequestServiceImplTest {
 
     @Mock
@@ -58,7 +58,7 @@ class ItemRequestServiceImplTest {
 
     private ItemRequest itemRequest;
 
-    @BeforeAll
+    @BeforeEach
     public void init() {
         userId = 1;
         itemRequest = ItemRequest.builder().description("description").build();
