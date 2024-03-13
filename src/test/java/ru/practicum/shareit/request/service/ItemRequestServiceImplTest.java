@@ -239,4 +239,51 @@ class ItemRequestServiceImplTest {
         verify(itemRequestMapper, times(1)).toDtoList(any());
     }
 
+    @Test
+    public void getItemRequestById_UserNotFound_ShouldThrowNotFoundException() {
+        long requestId = 1;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> itemRequestService.getItemRequestById(userId, requestId));
+
+        assertThat(e.getMessage(), is("Пользователь с id '1' не найден."));
+
+        verify(itemRequestMapper, never()).toDto(any());
+    }
+
+    @Test
+    public void getItemRequestById_RequestNotFound_ShouldThrowNotFoundException() {
+        long requestId = 1;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.of(new User()));
+
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> itemRequestService.getItemRequestById(userId, requestId));
+
+        assertThat(e.getMessage(), is("Запрос с id '1' не найден."));
+
+        verify(userStorage, times(1)).findById(userId);
+        verify(itemRequestMapper, never()).toDto(any());
+    }
+
+    @Test
+    public void getItemRequestById_ShouldReturnRequest() {
+        long requestId = 1;
+        itemRequest.setId(1L);
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.of(new User()));
+        when(itemRequestStorage.findById(requestId))
+                .thenReturn(Optional.of(itemRequest));
+
+        itemRequestService.getItemRequestById(userId, requestId);
+
+        verify(userStorage, times(1)).findById(userId);
+        verify(itemRequestStorage, times(1)).findById(requestId);
+        verify(itemRequestMapper, times(1)).toDto(itemRequest);
+    }
 }
