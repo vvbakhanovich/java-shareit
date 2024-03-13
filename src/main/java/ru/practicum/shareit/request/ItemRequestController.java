@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.shareit.request.dto.AddItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -28,6 +30,7 @@ public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public ItemRequestDto addNewItemRequest(@RequestHeader("X-Sharer-User-id") Long userId,
                                             @RequestBody @Valid AddItemRequestDto addItemRequestDto) {
         return itemRequestService.addNewItemRequest(userId, addItemRequestDto);
@@ -39,9 +42,9 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDto> getAllItemRequests(@RequestHeader("X-Sharer-User-id") Long userId,
-                                                   @RequestParam(required = false) @PositiveOrZero Long from,
-                                                   @RequestParam(required = false) @Positive Integer size) {
+    public List<ItemRequestDto> getAvailableItemRequests(@RequestHeader("X-Sharer-User-id") Long userId,
+                                                         @RequestParam(required = false) @PositiveOrZero Long from,
+                                                         @RequestParam(required = false) @Positive Integer size) {
         return itemRequestService.getAvailableItemRequests(userId, from, size);
     }
 
