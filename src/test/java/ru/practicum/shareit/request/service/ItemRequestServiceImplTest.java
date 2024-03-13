@@ -1,7 +1,9 @@
 package ru.practicum.shareit.request.service;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -9,11 +11,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import ru.practicum.shareit.request.dto.AddItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestStorage;
+import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
@@ -28,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ItemRequestServiceImplTest {
 
     @Mock
@@ -45,13 +50,21 @@ class ItemRequestServiceImplTest {
     @Captor
     private ArgumentCaptor<ItemRequest> itemRequestArgumentCaptor;
 
+    private long userId;
+
+    private ItemRequest itemRequest;
+
+    @BeforeAll
+    public void init() {
+        userId = 1;
+        itemRequest = ItemRequest.builder().description("description").build();
+    }
+
     @Test
     public void addNewItemRequest_ShouldSetRequester() {
-        long userId = 1;
         User user = new User();
         String description = "description";
         AddItemRequestDto addItemRequestDto = new AddItemRequestDto(description);
-        ItemRequest itemRequest = ItemRequest.builder().description(description).build();
         ItemRequest itemRequest2 = ItemRequest.builder().description(description).build();
 
         when(userStorage.findById(userId))
@@ -74,7 +87,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     public void addNewItemRequest_NoUserFound_ThrowNotFoundException() {
-        long userId = 1;
         AddItemRequestDto addItemRequestDto = new AddItemRequestDto();
         when(userStorage.findById(userId))
                 .thenReturn(Optional.empty());
@@ -90,7 +102,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     public void getAllItemRequestsFromUser_ShouldReturnEmptyList() {
-        long userId = 1;
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
         when(itemRequestStorage.findRequestsFromUser(userId))
@@ -110,8 +121,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     public void getAllItemRequestsFromUser_ShouldReturnRequestList() {
-        long userId = 1;
-        ItemRequest itemRequest = new ItemRequest();
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
@@ -133,8 +142,6 @@ class ItemRequestServiceImplTest {
 
     @Test
     public void getAllItemRequestsFromUser_NoUserFound_ShouldThrowNotFoundException() {
-        long userId = 1;
-
         when(userStorage.findById(userId))
                 .thenReturn(Optional.empty());
 
@@ -146,6 +153,90 @@ class ItemRequestServiceImplTest {
         verify(userStorage, times(1)).findById(userId);
         verify(itemRequestStorage, never()).findRequestsFromUser(userId);
         verify(itemRequestMapper, never()).toDtoList(any());
+    }
+
+    @Test
+    public void getAvailableItemRequests_WithNullFromAndSize_ShouldInvokeFindAll() {
+        Long from = null;
+        Integer size = null;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.of(new User()));
+
+        itemRequestService.getAvailableItemRequests(userId, from, size);
+
+        verify(itemRequestStorage, times(1)).findAllRequests();
+        verify(itemRequestMapper, times(1)).toDtoList(any());
+    }
+
+    @Test
+    public void getAvailableItemRequests_UserNotExists_ShouldThrowNotFoundException() {
+        Long from = 1L;
+        Integer size = 1;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException e = assertThrows(NotFoundException.class,
+                () -> itemRequestService.getAvailableItemRequests(userId, from, size));
+
+        assertThat(e.getMessage(), is("Пользователь с id '1' не найден."));
+
+        verify(itemRequestStorage, never()).findAllRequests();
+        verify(itemRequestStorage, never()).findAvailableRequests(userId, OffsetPageRequest.of(from, size));
+        verify(itemRequestMapper, never()).toDtoList(any());
+    }
+
+    @Test
+    public void getAvailableItemRequests_FromNullSizeNotNull_ShouldThrowIllegalArgumentException() {
+        Long from = null;
+        Integer size = 1;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.of(new User()));
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> itemRequestService.getAvailableItemRequests(userId, from, size));
+
+        assertThat(e.getMessage(), is("Offset must be positive!"));
+
+        verify(itemRequestStorage, never()).findAllRequests();
+        verify(itemRequestMapper, never()).toDtoList(any());
+    }
+
+    @Test
+    public void getAvailableItemRequests_FromNotNullSizeNull_ShouldThrowIllegalArgumentException() {
+        Long from = 1L;
+        Integer size = null;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.of(new User()));
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
+                () -> itemRequestService.getAvailableItemRequests(userId, from, size));
+
+        assertThat(e.getMessage(), is("Page size must be positive or zero!"));
+
+        verify(itemRequestStorage, never()).findAllRequests();
+        verify(itemRequestMapper, never()).toDtoList(any());
+    }
+
+    @Test
+    public void getAvailableItemRequests_WithNotNullFromAndSize_ShouldInvokeFindAllPageable() {
+        Long from = 1L;
+        Integer size = 2;
+
+        when(userStorage.findById(userId))
+                .thenReturn(Optional.of(new User()));
+        when(itemRequestStorage.findAvailableRequests(eq(userId), any()))
+                .thenReturn(Page.empty());
+
+        itemRequestService.getAvailableItemRequests(userId, from, size);
+
+        verify(itemRequestStorage, never()).findAllRequests();
+        verify(itemRequestStorage, times(1)).findAvailableRequests(eq(userId),
+                any());
+        verify(itemRequestMapper, times(1)).toDtoList(any());
     }
 
 }
