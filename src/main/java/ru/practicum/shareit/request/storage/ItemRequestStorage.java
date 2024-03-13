@@ -9,8 +9,8 @@ import ru.practicum.shareit.request.model.ItemRequest;
 import java.util.List;
 
 public interface ItemRequestStorage extends JpaRepository<ItemRequest, Long> {
-
-    List<ItemRequest> findAllByRequesterIdOrderByCreatedDesc(Long requesterId);
+    @Query("SELECT ir FROM ItemRequest ir LEFT JOIN FETCH ir.items i ORDER BY ir.created DESC ")
+    List<ItemRequest> findAllRequests();
 
     @Query(value = "SELECT ir FROM ItemRequest ir LEFT JOIN FETCH ir.items i JOIN ir.requester r WHERE r.id != ?1 ORDER BY ir.created DESC ",
             countQuery = "SELECT COUNT(ir) FROM ItemRequest ir LEFT JOIN ir.items i JOIN ir.requester r WHERE r.id != ?1 GROUP BY ir.created ORDER BY ir.created DESC ")

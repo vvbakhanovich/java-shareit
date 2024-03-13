@@ -47,7 +47,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getAllItemRequests(Long userId, Long from, Integer size) {
         findUser(userId);
         if (from == null && size == null) {
-            return itemRequestMapper.toDtoList(itemRequestStorage.findAll());
+            return itemRequestMapper.toDtoList(itemRequestStorage.findAllRequests());
         }
         OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(userId, pageRequest);
