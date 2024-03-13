@@ -5,29 +5,29 @@ import org.springframework.data.domain.Sort;
 
 public class OffsetPageRequest implements Pageable {
 
-    private final long offset;
-    private final int size;
-
+    private final Long offset;
+    private final Integer size;
     private final Sort sort;
 
-    private OffsetPageRequest(long offset, int size, Sort sort) {
+    private OffsetPageRequest(Long offset, Integer size, Sort sort) {
         validateOffsetAndSize(offset, size);
         this.offset = offset;
         this.size = size;
         this.sort = sort;
     }
 
-    private OffsetPageRequest(long offset, int size) {
+    private OffsetPageRequest(Long offset, Integer size) {
+        validateOffsetAndSize(offset, size);
         this.offset = offset;
         this.size = size;
         sort = Sort.unsorted();
     }
 
-    public static OffsetPageRequest of(long offset, int size, Sort sort) {
+    public static OffsetPageRequest of(Long offset, Integer size, Sort sort) {
         return new OffsetPageRequest(offset, size, sort);
     }
 
-    public static OffsetPageRequest of(long offset, int size) {
+    public static OffsetPageRequest of(Long offset, Integer size) {
         return new OffsetPageRequest(offset, size);
     }
 
@@ -76,12 +76,12 @@ public class OffsetPageRequest implements Pageable {
         return offset - size < 0;
     }
 
-    private void validateOffsetAndSize(long offset, int size) {
-        if (offset < 0) {
-            throw new IllegalArgumentException("Offset must can not be negative!");
+    private void validateOffsetAndSize(Long offset, Integer size) {
+        if (offset == null || offset < 0) {
+            throw new IllegalArgumentException("Offset must be positive!");
         }
-        if (size < 0) {
-            throw new IllegalArgumentException("Page size must can not be negative!");
+        if (size == null || size < 0) {
+            throw new IllegalArgumentException("Page size must be positive or zero!");
         }
     }
 }

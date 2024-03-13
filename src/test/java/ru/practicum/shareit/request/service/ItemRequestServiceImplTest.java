@@ -93,7 +93,7 @@ class ItemRequestServiceImplTest {
         long userId = 1;
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
-        when(itemRequestStorage.findAllByRequesterIdOrderByCreatedDesc(userId))
+        when(itemRequestStorage.findRequestsFromUser(userId))
                 .thenReturn(Collections.emptyList());
         when(itemRequestMapper.toDtoList(Collections.emptyList()))
                 .thenReturn(Collections.emptyList());
@@ -104,7 +104,7 @@ class ItemRequestServiceImplTest {
         assertThat(requests, is(Collections.emptyList()));
 
         verify(userStorage, times(1)).findById(userId);
-        verify(itemRequestStorage, times(1)).findAllByRequesterIdOrderByCreatedDesc(userId);
+        verify(itemRequestStorage, times(1)).findRequestsFromUser(userId);
         verify(itemRequestMapper, times(1)).toDtoList(Collections.emptyList());
     }
 
@@ -115,7 +115,7 @@ class ItemRequestServiceImplTest {
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
-        when(itemRequestStorage.findAllByRequesterIdOrderByCreatedDesc(userId))
+        when(itemRequestStorage.findRequestsFromUser(userId))
                 .thenReturn(List.of(itemRequest));
         when(itemRequestMapper.toDtoList(List.of(itemRequest)))
                 .thenReturn(List.of(itemRequestDto));
@@ -127,7 +127,7 @@ class ItemRequestServiceImplTest {
         assertThat(requests.size(), is(1));
 
         verify(userStorage, times(1)).findById(userId);
-        verify(itemRequestStorage, times(1)).findAllByRequesterIdOrderByCreatedDesc(userId);
+        verify(itemRequestStorage, times(1)).findRequestsFromUser(userId);
         verify(itemRequestMapper, times(1)).toDtoList(List.of(itemRequest));
     }
 
@@ -144,7 +144,7 @@ class ItemRequestServiceImplTest {
         assertThat(e.getMessage(), is("Пользователь с id '1' не найден."));
 
         verify(userStorage, times(1)).findById(userId);
-        verify(itemRequestStorage, never()).findAllByRequesterIdOrderByCreatedDesc(userId);
+        verify(itemRequestStorage, never()).findRequestsFromUser(userId);
         verify(itemRequestMapper, never()).toDtoList(any());
     }
 

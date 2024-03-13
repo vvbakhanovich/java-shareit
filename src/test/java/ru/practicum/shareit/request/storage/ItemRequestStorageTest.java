@@ -104,7 +104,7 @@ class ItemRequestStorageTest {
 
     @Test
     public void findAllByOrderByCreatedDesc_From0Size1_ShouldReturnListOfItemRequest() {
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 1);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 1);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
@@ -116,7 +116,7 @@ class ItemRequestStorageTest {
     @Test
     @SneakyThrows
     public void findAllByOrderByCreatedDesc_From0Size10_ShouldReturnListOfTwoItemRequest() {
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 10);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 10);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
@@ -127,7 +127,7 @@ class ItemRequestStorageTest {
 
     @Test
     public void findAllByOrderByCreatedDesc_From0Size0_ShouldReturnEmptyList() {
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 0);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 0);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
@@ -138,7 +138,7 @@ class ItemRequestStorageTest {
 
     @Test
     public void findAllByOrderByCreatedDesc_From1Size1_ShouldReturnListOfItemRequest() {
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(1, 1);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(1L, 1);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
@@ -149,7 +149,7 @@ class ItemRequestStorageTest {
 
     @Test
     public void findAllByOrderByCreatedDesc_From1Size1_ShouldReturnAllItemRequest() {
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(0, 2);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 2);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
