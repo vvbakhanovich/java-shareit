@@ -44,7 +44,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    public List<ItemRequestDto> getAllItemRequests(Long userId, Long from, Integer size) {
+    public List<ItemRequestDto> getAvailableItemRequests(Long userId, Long from, Integer size) {
         findUser(userId);
         if (from == null && size == null) {
             return itemRequestMapper.toDtoList(itemRequestStorage.findAllRequests());
