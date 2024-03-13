@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -74,6 +75,15 @@ public class ApplicationExceptionHandler {
             log.error("Поле {} не прошло валидацию. Причина: {}.", error.getField(), error.getDefaultMessage());
         }
 
+        return errorResponse;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleItemUnavailableException(ConstraintViolationException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.getErrors().put("Error message", e.getLocalizedMessage());
+        log.error(e.getLocalizedMessage());
         return errorResponse;
     }
 
