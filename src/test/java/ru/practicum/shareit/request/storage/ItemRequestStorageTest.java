@@ -20,7 +20,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -123,17 +125,6 @@ class ItemRequestStorageTest {
 
         assertThat(requests.getContent(), is(List.of(savedRequest3, savedRequest2)));
         assertThat(requests.getContent().size(), is(2));
-    }
-
-    @Test
-    public void findAllByOrderByCreatedDesc_From0Size0_ShouldReturnEmptyList() {
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 0);
-
-        Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
-                pageRequest);
-
-        assertThat(requests.getContent(), is(Collections.emptyList()));
-        assertThat(requests.getContent().size(), is(0));
     }
 
     @Test

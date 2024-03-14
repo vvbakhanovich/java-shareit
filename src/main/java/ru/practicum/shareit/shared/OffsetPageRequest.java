@@ -78,10 +78,10 @@ public class OffsetPageRequest implements Pageable {
 
     private void validateOffsetAndSize(Long offset, Integer size) {
         if (offset == null || offset < 0) {
-            throw new IllegalArgumentException("Offset must be positive!");
+            throw new IllegalArgumentException("Offset must be positive or zero!");
         }
-        if (size == null || size < 0) {
-            throw new IllegalArgumentException("Page size must be positive or zero!");
+        if (size == null || size <= 0) {
+            throw new IllegalArgumentException("Page size must be positive!");
         }
     }
 }

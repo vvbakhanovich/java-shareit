@@ -200,7 +200,7 @@ class ItemRequestServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> itemRequestService.getAvailableItemRequests(userId, from, size));
 
-        assertThat(e.getMessage(), is("Offset must be positive!"));
+        assertThat(e.getMessage(), is("Offset must be positive or zero!"));
 
         verify(itemRequestStorage, never()).findAllRequests();
         verify(itemRequestMapper, never()).toDtoList(any());
@@ -217,7 +217,7 @@ class ItemRequestServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class,
                 () -> itemRequestService.getAvailableItemRequests(userId, from, size));
 
-        assertThat(e.getMessage(), is("Page size must be positive or zero!"));
+        assertThat(e.getMessage(), is("Page size must be positive!"));
 
         verify(itemRequestStorage, never()).findAllRequests();
         verify(itemRequestMapper, never()).toDtoList(any());
