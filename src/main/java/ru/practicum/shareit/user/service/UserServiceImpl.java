@@ -48,14 +48,9 @@ public class UserServiceImpl implements UserService {
     public UserDto updateUser(final long userId, final UserUpdateDto userUpdateDto) {
         User storedUser = userStorage.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id '" + userId + "' не найден."));
-        if (userUpdateDto.getName() != null) {
-            storedUser.setName(userUpdateDto.getName());
-        }
-        if (userUpdateDto.getEmail() != null) {
-            storedUser.setEmail(userUpdateDto.getEmail());
-        }
-        log.info("Обновление пользователя с id '{}'.", userId);
+        updateNameAndEmail(userUpdateDto, storedUser);
         userStorage.save(storedUser);
+        log.info("Обновление пользователя с id '{}'.", userId);
         return userMapper.toDto(storedUser);
     }
 
@@ -94,5 +89,14 @@ public class UserServiceImpl implements UserService {
     public void deleteUserById(final long userId) {
         userStorage.deleteById(userId);
         log.info("Удаление пользователя с id '{}'.", userId);
+    }
+
+    private void updateNameAndEmail(UserUpdateDto userUpdateDto, User storedUser) {
+        if (userUpdateDto.getName() != null) {
+            storedUser.setName(userUpdateDto.getName());
+        }
+        if (userUpdateDto.getEmail() != null) {
+            storedUser.setEmail(userUpdateDto.getEmail());
+        }
     }
 }
