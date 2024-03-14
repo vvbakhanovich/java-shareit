@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,12 +12,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,13 +37,22 @@ class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Test
-    @SneakyThrows
-    void addUser_ValidUser_ShouldReturnDto() {
-        UserDto userDto = UserDto.builder()
+    private UserDto userDto;
+
+    private long userId;
+
+    @BeforeEach
+    void setUp() {
+        userDto = UserDto.builder()
                 .name("name")
                 .email("test@mail.com")
                 .build();
+        userId = 1;
+    }
+
+    @Test
+    @SneakyThrows
+    void addUser_ValidUser_ShouldReturnDto() {
         when(userService.addUser(userDto))
                 .thenReturn(userDto);
 
@@ -58,22 +70,32 @@ class UserControllerTest {
     @Test
     @SneakyThrows
     void addUser_NotValidUser_ShouldThrowMethodArgumentNotValidException() {
-        UserDto userDto = UserDto.builder()
-                .name("name")
-                .email(null)
-                .build();
+        userDto.setEmail(null);
 
         mvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result ->
                         assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                .andExpect(jsonPath("$.errors.email", is( "Должен быть обязательно указан email.")));
+                .andExpect(jsonPath("$.errors.email", is("Должен быть обязательно указан email.")));
     }
 
     @Test
-    void updateUser() {
+    @SneakyThrows
+    void updateUser_ShouldReturnUserDto() {
+        UserUpdateDto updateDto = new UserUpdateDto();
+        when(userService.updateUser(userId, updateDto))
+                .thenReturn(userDto);
+
+        mvc.perform(patch("/users/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
+                .andExpect(jsonPath("$.email", is(userDto.getEmail())));
     }
 
     @Test
