@@ -18,7 +18,11 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -66,6 +70,8 @@ class UserControllerTest {
                 .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+
+        verify(userService, times(1)).addUser(userDto);
     }
 
     @Test
@@ -80,6 +86,8 @@ class UserControllerTest {
                 .andExpect(result ->
                         assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
                 .andExpect(jsonPath("$.errors.email", is("Должен быть обязательно указан email.")));
+
+        verify(userService, never()).addUser(userDto);
     }
 
     @Test
@@ -97,6 +105,8 @@ class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+
+        verify(userService, times(1)).updateUser(userId, updateDto);
     }
 
     @Test
@@ -113,11 +123,13 @@ class UserControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+
+        verify(userService, times(1)).findUserById(userId);
     }
 
     @Test
     @SneakyThrows
-    void getAllUsers() {
+    void getAllUsers_ShouldReturnListOfUserDto() {
         when(userService.findAllUsers())
                 .thenReturn(List.of(userDto));
 
@@ -127,9 +139,16 @@ class UserControllerTest {
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(userDto))))
                 .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())))
                 .andExpect(jsonPath("$.length()", is(1)));
+
+        verify(userService, times(1)).findAllUsers();
     }
 
     @Test
-    void deleteUserById() {
+    @SneakyThrows
+    void deleteUserById_ShouldReturnOkStatus() {
+        mvc.perform(delete("/users/{userId}", userId))
+                .andExpect(status().isOk());
+
+        verify(userService, times(1)).deleteUserById(userId);
     }
 }
