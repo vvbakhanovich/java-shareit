@@ -14,6 +14,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -114,7 +116,17 @@ class UserControllerTest {
     }
 
     @Test
+    @SneakyThrows
     void getAllUsers() {
+        when(userService.findAllUsers())
+                .thenReturn(List.of(userDto));
+
+        mvc.perform(get("/users")
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(userDto))))
+                .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())))
+                .andExpect(jsonPath("$.length()", is(1)));
     }
 
     @Test
