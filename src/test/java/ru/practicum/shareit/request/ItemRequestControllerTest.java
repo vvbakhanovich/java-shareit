@@ -68,7 +68,7 @@ class ItemRequestControllerTest {
                         .content(objectMapper.writeValueAsString(addItemRequestDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
         verify(itemRequestService, never()).addNewItemRequest(any(), any());
@@ -114,7 +114,7 @@ class ItemRequestControllerTest {
     void getAllItemRequestsFromUser_NoHeader_ShouldThrowMissingRequestHeaderException() {
         mvc.perform(get("/requests")
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
         verify(itemRequestService, never()).addNewItemRequest(any(), any());
@@ -141,7 +141,7 @@ class ItemRequestControllerTest {
     @SneakyThrows
     public void getAvailableItemRequests_NoHeader_ShouldThrowMissingRequestHeaderException() {
         mvc.perform(get("/requests/all"))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
         verify(itemRequestService, never()).getAvailableItemRequests(any(), any(), any());
@@ -222,7 +222,7 @@ class ItemRequestControllerTest {
     @SneakyThrows
     public void getItemRequestById_WithoutHeader_ShouldThrowMissingRequestHeaderException() {
         mvc.perform(get("/requests/{requestId}", 1))
-                .andExpect(status().isInternalServerError())
+                .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
         verify(itemRequestService, never()).getItemRequestById(any(), any());
