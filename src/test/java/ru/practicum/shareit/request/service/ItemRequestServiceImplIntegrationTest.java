@@ -1,5 +1,7 @@
 package ru.practicum.shareit.request.service;
 
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -49,6 +51,11 @@ class ItemRequestServiceImplIntegrationTest {
         addItemRequestDto = new AddItemRequestDto("description");
     }
 
+    @AfterAll
+    void deleteUsersAfterTest() {
+        userStorage.deleteAll();
+    }
+
     @Test
     void addNewItemRequest_ShouldReturnRequestDto() {
         ItemRequestDto itemRequestDto = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
@@ -85,6 +92,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @SneakyThrows
     void getAvailableItemRequests_From0Size5_ShouldReturn2Requests() {
         User user2 = User.builder().name("username2").email("test2@email.com").build();
         AddItemRequestDto addItemRequestDto2 = new AddItemRequestDto("description 2");
@@ -92,6 +100,7 @@ class ItemRequestServiceImplIntegrationTest {
         User savedUser2 = userStorage.save(user2);
         itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
         ItemRequestDto savedRequest2 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto2);
+        Thread.sleep(100L);
         ItemRequestDto savedRequest3 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto3);
 
         List<ItemRequestDto> availableItemRequests = itemRequestService
@@ -102,6 +111,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @SneakyThrows
     void getAvailableItemRequests_From1Size5_ShouldReturn1Requests() {
         User user2 = User.builder().name("username2").email("test2@email.com").build();
         AddItemRequestDto addItemRequestDto2 = new AddItemRequestDto("description 2");
@@ -109,6 +119,7 @@ class ItemRequestServiceImplIntegrationTest {
         User savedUser2 = userStorage.save(user2);
         itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
         ItemRequestDto savedRequest2 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto2);
+        Thread.sleep(100L);
         ItemRequestDto savedRequest3 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto3);
 
         List<ItemRequestDto> availableItemRequests = itemRequestService
@@ -136,13 +147,16 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @SneakyThrows
     void getAvailableItemRequests_FromNullSizeNull_ShouldReturnAllRequests() {
         User user2 = User.builder().name("username2").email("test2@email.com").build();
         AddItemRequestDto addItemRequestDto2 = new AddItemRequestDto("description 2");
         AddItemRequestDto addItemRequestDto3 = new AddItemRequestDto("description 3");
         User savedUser2 = userStorage.save(user2);
         ItemRequestDto savedRequest1 = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
+        Thread.sleep(100L);
         ItemRequestDto savedRequest2 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto2);
+        Thread.sleep(100L);
         ItemRequestDto savedRequest3 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto3);
 
         List<ItemRequestDto> availableItemRequests = itemRequestService
