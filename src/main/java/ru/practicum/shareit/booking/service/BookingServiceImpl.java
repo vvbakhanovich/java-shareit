@@ -117,69 +117,52 @@ public class BookingServiceImpl implements BookingService {
     }
 
     /**
-     * Получение списка всех бронирований текущего пользователя. Параметр state необязательный и по умолчанию равен ALL.
-     * Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
-     * отсортированными по дате от более новых к более старым.  При наличии параметров from и size результат отображается
-     * постранично, начиная с элемента под номером from по количеству элементов на странице, равному size.
+     * Получение списка бронирований для всех вещей пользователя. Параметр state необязательный и по умолчанию
+     * равен ALL. Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
+     * отсортированными по дате от более новых к более старым. При наличии параметров from и size результат отображается
+     * постранично, начиная с элемента под номером from по количеству элементов на странице, равному size. Флаг isOwner
+     * определяет то, какие бронирования увидит пользователь. Если true, то будет получен список собственных
+     * бронирований, если false, то будет получен список бронирований остальных пользователей.
      *
-     * @param userId идентификатор пользователя, делающего запрос
-     * @param state  статус бронирования
-     * @param from   индекс первого отображаемого элемента (отсчет начинается с нуля)
-     * @param size   количество отображаемых элементов на странице
+     * @param userId  идентификатор пользователя, делающего запрос
+     * @param state   статус бронирования
+     * @param from    индекс индекс первого отображаемого элемента (отсчет начинается с нуля)
+     * @param size    количество отображаемых элементов на странице
+     * @param isOwner флаг, хочет ли запрашивающий пользователь посмотреть свои бронирования (true) или список
+     *                бронирований других пользователей
      * @return список бронирований
      */
     @Override
-    public List<BookingDto> getAllOwnerBookings(final Long userId, final GetBookingState state, Long from, Integer size) {
+    public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state, Long from,
+                                                   Integer size, boolean isOwner) {
         findUser(userId);
         Iterable<Booking> result = new ArrayList<>();
+        if (isOwner) {
+            result = getBookingFromOwner(userId, state, from, size, result);
+        } else {
+            result = getBookingFromUser(userId, state, from, size, result);
+        }
+        return bookingMapper.toDtoList(Lists.newArrayList(result));
+    }
+
+    private Iterable<Booking> getBookingFromOwner(Long userId, GetBookingState state, Long from, Integer size, Iterable<Booking> result) {
         if (from == null && size == null) {
             result = getAllSortedBookingsFromUser(state, result, userId);
         } else {
             OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
             result = getAllSortedBookingsFromUser(state, result, userId, pageRequest);
         }
-        return bookingMapper.toDtoList(Lists.newArrayList(result));
+        return result;
     }
 
-    /**
-     * Получение списка бронирований для всех вещей текущего пользователя. Параметр state необязательный и по умолчанию
-     * равен ALL. Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
-     * отсортированными по дате от более новых к более старым. При наличии параметров from и size результат отображается
-     * постранично, начиная с элемента под номером from по количеству элементов на странице, равному size.
-     *
-     * @param userId идентификатор пользователя, делающего запрос
-     * @param state  статус бронирования
-     * @param from   индекс индекс первого отображаемого элемента (отсчет начинается с нуля)
-     * @param size   количество отображаемых элементов на странице
-     * @return список бронирований
-     */
-    @Override
-    public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state, Long from, Integer size) {
-        findUser(userId);
-        Iterable<Booking> result = new ArrayList<>();
+    private Iterable<Booking> getBookingFromUser(Long userId, GetBookingState state, Long from, Integer size, Iterable<Booking> result) {
         if (from == null && size == null) {
             result = getAllSortedBookingsFromBooker(state, result, userId);
         } else {
             OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
             result = getAllSortedBookingsFromBooker(state, result, userId, pageRequest);
         }
-        return bookingMapper.toDtoList(Lists.newArrayList(result));
-    }
-
-    private User findUser(final Long userId) {
-        return userStorage.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id '" + userId + "' не найден."));
-    }
-
-    private Booking findBooking(final Long bookingId) {
-        return bookingStorage.findBookingById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Бронирование с id '" + bookingId + "' не найдено."));
-    }
-
-    private void checkItemAvailability(final Item item) {
-        if (!item.getAvailable()) {
-            throw new ItemUnavailableException("Вещь недоступна для бронирования.");
-        }
+        return result;
     }
 
     private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
@@ -282,5 +265,21 @@ public class BookingServiceImpl implements BookingService {
                 break;
         }
         return result;
+    }
+
+    private User findUser(final Long userId) {
+        return userStorage.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id '" + userId + "' не найден."));
+    }
+
+    private Booking findBooking(final Long bookingId) {
+        return bookingStorage.findBookingById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Бронирование с id '" + bookingId + "' не найдено."));
+    }
+
+    private void checkItemAvailability(final Item item) {
+        if (!item.getAvailable()) {
+            throw new ItemUnavailableException("Вещь недоступна для бронирования.");
+        }
     }
 }
