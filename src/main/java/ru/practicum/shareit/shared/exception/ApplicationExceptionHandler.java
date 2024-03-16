@@ -56,7 +56,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorMessage handleConversionFailedException(MethodArgumentTypeMismatchException e) {
         ErrorMessage errorMessage = new ErrorMessage("Unknown state: " + e.getValue());
         log.error(e.getLocalizedMessage());
