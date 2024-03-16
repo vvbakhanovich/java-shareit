@@ -86,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
                     "' не является владельцем вещи с id '" + item.getId() + "'.");
         }
         if (!booking.getStatus().equals(BookingStatus.WAITING)) {
-            throw new ItemUnavailableException("Вещь уже находится в аренде.");
+            throw new ItemUnavailableException("Текущий статус бронирования не позволяет сделать подтверждение.");
         }
         if (approved) {
             booking.setStatus(BookingStatus.APPROVED);
