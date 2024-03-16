@@ -21,7 +21,6 @@ import static org.hamcrest.Matchers.notNullValue;
 @ContextConfiguration(classes = {
         ItemMapperImpl.class,
         ItemRequestMapperImpl.class})
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ItemRequestMapperTest {
 
     @Autowired
