@@ -55,11 +55,11 @@ public interface BookingStorage extends JpaRepository<Booking, Long> {
     countQuery = "SELECT COUNT(b) FROM Booking b JOIN b.item i JOIN b.booker u WHERE i.owner.id = ?1 AND b.start >= ?2 ORDER BY b.start DESC")
     List<Booking> findFutureBookingsByOwnerId(Long ownerId, LocalDateTime startAfter, Pageable pageable);
 
-    @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.status = ?2")
+    @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.status = ?2 ORDER BY b.start DESC")
     List<Booking> findBookingsByOwnerIdAndStatus(Long ownerId, BookingStatus status);
 
-    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.status = ?2",
-    countQuery = "SELECT COUNT(b) FROM Booking b JOIN b.item i JOIN b.booker u WHERE i.owner.id = ?1 AND b.status = ?2")
+    @Query(value = "SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE i.owner.id = ?1 AND b.status = ?2 ORDER BY b.start DESC",
+    countQuery = "SELECT COUNT(b) FROM Booking b JOIN b.item i JOIN b.booker u WHERE i.owner.id = ?1 AND b.status = ?2 ORDER BY b.start DESC")
     List<Booking> findBookingsByOwnerIdAndStatus(Long ownerId, BookingStatus status, Pageable pageable);
 
     @Query("SELECT b FROM Booking b JOIN FETCH b.item i JOIN FETCH b.booker u WHERE b.booker.id = ?1 ORDER BY b.start DESC")
