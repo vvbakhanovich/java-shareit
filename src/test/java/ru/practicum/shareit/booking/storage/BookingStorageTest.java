@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.storage;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +15,10 @@ import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static java.time.LocalDateTime.*;
+import static java.time.LocalDateTime.now;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -44,10 +40,6 @@ class BookingStorageTest {
     private Item savedItem1;
 
     private Item savedItem2;
-
-    private Item savedItem3;
-
-    private Item savedItem4;
 
     private User savedUser1;
 
@@ -74,9 +66,6 @@ class BookingStorageTest {
         Item item2 = createItem(2L);
         item2.setOwner(savedUser1);
         savedItem2 = itemStorage.save(item2);
-        Item item3 = createItem(3L);
-        item3.setOwner(savedUser2);
-        savedItem3 = itemStorage.save(item3);
 
         Booking booking1 = createBooking(1L);
         booking1.setItem(savedItem1);
