@@ -1,12 +1,10 @@
 package ru.practicum.shareit.shared;
 
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OffsetPageRequestTest {
@@ -58,7 +56,7 @@ class OffsetPageRequestTest {
         OffsetPageRequest next = (OffsetPageRequest) offsetPageRequest.next();
 
         assertThat(next.getOffset(), is(offset + size));
-        assertThat(next.getPageSize(), is( size));
+        assertThat(next.getPageSize(), is(size));
     }
 
     @Test
@@ -67,7 +65,7 @@ class OffsetPageRequestTest {
         Integer size = 4;
         OffsetPageRequest offsetPageRequest = OffsetPageRequest.of(offset, size);
 
-        assertThat(offsetPageRequest.hasPrevious(),  is(true));
+        assertThat(offsetPageRequest.hasPrevious(), is(true));
     }
 
     @Test
@@ -76,7 +74,7 @@ class OffsetPageRequestTest {
         Integer size = 4;
         OffsetPageRequest offsetPageRequest = OffsetPageRequest.of(offset, size);
 
-        assertThat(offsetPageRequest.hasPrevious(),  is(false));
+        assertThat(offsetPageRequest.hasPrevious(), is(false));
     }
 
     @Test
