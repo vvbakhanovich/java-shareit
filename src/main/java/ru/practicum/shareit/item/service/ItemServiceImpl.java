@@ -99,6 +99,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public GetItemDto findItemById(final Long userId, final Long itemId) {
+        getUser(userId);
         final Item item = getItem(itemId);
         List<Booking> itemBookings = bookingStorage.findAllByItemId(itemId);
         GetItemDto itemWithBookingDatesDto;
@@ -121,7 +122,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public List<GetItemDto> findAllItemsByUserId(final Long userId) {
-        userStorage.findById(userId);
+        getUser(userId);
         final List<Item> items = itemStorage.findAllByOwnerIdOrderById(userId);
         final List<Long> itemIds = items.stream()
                 .map(Item::getId).collect(Collectors.toList());
@@ -147,7 +148,7 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         String searchText = "%" + text.toLowerCase() + "%";
-        final Iterable<Item> searchResult = itemStorage.findAllByNameOrDescriptionContainingIgnoreCase(searchText);
+        final Iterable<Item> searchResult = itemStorage.searchInTitleAndDescription(searchText);
         return itemMapper.toDtoList(Lists.newArrayList(searchResult));
     }
 
