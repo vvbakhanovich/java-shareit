@@ -29,15 +29,6 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleEmailAlreadyExistsException(EmailAlreadyExists e) {
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.getErrors().put("errorMessage", e.getLocalizedMessage());
-        log.error(e.getLocalizedMessage());
-        return errorResponse;
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemUnavailableException(ItemUnavailableException e) {
         ErrorResponse errorResponse = new ErrorResponse();
