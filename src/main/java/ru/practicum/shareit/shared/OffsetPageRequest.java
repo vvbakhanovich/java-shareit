@@ -9,22 +9,11 @@ public class OffsetPageRequest implements Pageable {
     private final Integer size;
     private final Sort sort;
 
-    private OffsetPageRequest(Long offset, Integer size, Sort sort) {
-        validateOffsetAndSize(offset, size);
-        this.offset = offset;
-        this.size = size;
-        this.sort = sort;
-    }
-
     private OffsetPageRequest(Long offset, Integer size) {
         validateOffsetAndSize(offset, size);
         this.offset = offset;
         this.size = size;
         sort = Sort.unsorted();
-    }
-
-    public static OffsetPageRequest of(Long offset, Integer size, Sort sort) {
-        return new OffsetPageRequest(offset, size, sort);
     }
 
     public static OffsetPageRequest of(Long offset, Integer size) {
@@ -63,17 +52,17 @@ public class OffsetPageRequest implements Pageable {
 
     @Override
     public Pageable first() {
-        return new OffsetPageRequest(offset, size);
+        return new OffsetPageRequest(offset - ((long) getPageNumber() * getPageSize()), size);
     }
 
     @Override
     public Pageable withPage(int pageNumber) {
-        return OffsetPageRequest.of(getOffset() * pageNumber, getPageSize());
+        return OffsetPageRequest.of(getOffset() + ((long) pageNumber * getPageSize()), getPageSize());
     }
 
     @Override
     public boolean hasPrevious() {
-        return offset - size < 0;
+        return offset - size > 0;
     }
 
     private void validateOffsetAndSize(Long offset, Integer size) {
