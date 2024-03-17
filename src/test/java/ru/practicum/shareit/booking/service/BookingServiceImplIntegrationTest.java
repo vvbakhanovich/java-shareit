@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -104,6 +105,12 @@ class BookingServiceImplIntegrationTest {
                 .start(LocalDateTime.now().minusDays(2))
                 .end(LocalDateTime.now().minusDays(1))
                 .build();
+    }
+
+    @AfterAll
+    public void cleanDb() {
+        userStorage.deleteAll();
+        itemStorage.deleteAll();
     }
 
     @Test

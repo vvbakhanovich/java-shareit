@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.service;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -66,6 +67,11 @@ class ItemServiceImplIntegrationTest {
                 .description("itemDto description")
                 .available(true)
                 .build();
+    }
+
+    @AfterAll
+    public void deleteUsers() {
+        userStorage.deleteAll();
     }
 
     @Test

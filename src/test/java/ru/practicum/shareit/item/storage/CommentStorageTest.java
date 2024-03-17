@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.storage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -81,6 +82,13 @@ class CommentStorageTest {
         comment3.setAuthor(savedUser2);
         comment3.setItem(savedItem2);
         savedComment3 = commentStorage.save(comment3);
+    }
+
+    @AfterAll
+    public void cleanDb() {
+        commentStorage.deleteAll();
+        itemStorage.deleteAll();
+        userStorage.deleteAll();
     }
 
     @Test

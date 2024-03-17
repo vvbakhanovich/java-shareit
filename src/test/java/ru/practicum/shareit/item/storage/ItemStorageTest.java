@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.storage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -57,6 +58,11 @@ class ItemStorageTest {
         savedItem3 = itemStorage.save(item3);
     }
 
+    @AfterAll
+    public void cleanDb() {
+        itemStorage.deleteAll();
+        userStorage.deleteAll();
+    }
 
     @Test
     void findAllByOwnerIdOrderById_ShouldReturnListOfTwoItems() {

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.storage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -85,6 +86,13 @@ class BookingStorageTest {
         booking3.setBooker(savedUser1);
         savedBooking3 = bookingStorage.save(booking3);
         pageRequest = OffsetPageRequest.of(0L, 1);
+    }
+
+    @AfterAll
+    public void cleanDb() {
+        bookingStorage.deleteAll();
+        itemStorage.deleteAll();
+        userStorage.deleteAll();
     }
 
     @Test

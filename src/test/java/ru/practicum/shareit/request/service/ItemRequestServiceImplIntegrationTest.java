@@ -46,6 +46,11 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @AfterAll
+    public void deleteUsers() {
+        userStorage.deleteAll();
+    }
+
+    @AfterAll
     void deleteUsersAfterTest() {
         userStorage.deleteAll();
     }

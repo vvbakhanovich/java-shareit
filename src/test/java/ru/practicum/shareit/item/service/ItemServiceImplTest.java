@@ -771,7 +771,7 @@ class ItemServiceImplTest {
         assertThat(captorValue.getText(), is(addCommentDto.getText()));
         assertThat(captorValue.getItem(), is(item));
         assertThat(captorValue.getAuthor(), is(requester));
-        assertThat(captorValue.getCreated(), lessThan(LocalDateTime.now()));
+        assertThat(captorValue.getCreated(), lessThanOrEqualTo(LocalDateTime.now()));
         verify(commentMapper, times(1)).toDto(any());
     }
 

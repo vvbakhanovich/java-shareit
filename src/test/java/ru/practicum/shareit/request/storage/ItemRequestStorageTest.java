@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.storage;
 
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -65,6 +66,13 @@ class ItemRequestStorageTest {
         savedRequest3 = itemRequestStorage.save(itemRequest3);
         ItemRequest itemRequest4 = ItemRequest.builder().requester(savedUser1).description("description4").build();
         savedRequest4 = itemRequestStorage.save(itemRequest4);
+    }
+
+    @AfterAll
+    public void cleanDb() {
+        itemStorage.deleteAll();
+        itemRequestStorage.deleteAll();
+        userStorage.deleteAll();
     }
 
     @Test
