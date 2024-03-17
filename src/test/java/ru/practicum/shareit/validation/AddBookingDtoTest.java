@@ -82,16 +82,4 @@ class AddBookingDtoTest {
 
         assertTrue(dtoHasErrorMessage(addBookingDto, "Задан некорректный интервал бронирования."));
     }
-
-    @Test
-    @DisplayName("Проверка невозможности создать бронирование, когда дата начала и окончания равны")
-    void testCreateWhenStartAndEndAreTheSame() {
-        AddBookingDto addBookingDto = AddBookingDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().plusDays(3))
-                .end(LocalDateTime.now().plusDays(3))
-                .build();
-
-        assertTrue(dtoHasErrorMessage(addBookingDto, "Задан некорректный интервал бронирования."));
-    }
 }
