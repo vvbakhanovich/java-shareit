@@ -221,8 +221,8 @@ class BookingControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
 
-        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, null, null
-                , isOwner);
+        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, null, null,
+                isOwner);
     }
 
     @Test
@@ -297,8 +297,8 @@ class BookingControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
 
-        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, null, null
-                , isOwner);
+        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, null, null,
+                isOwner);
     }
 
     @Test

@@ -227,7 +227,7 @@ class BookingStorageTest {
         List<Booking> bookings = bookingStorage.findPastBookingsByOwnerId(savedUser1.getId(), now(), pageRequest);
 
         assertThat(bookings, notNullValue());
-        assertThat(bookings,is(List.of(savedBooking1)));
+        assertThat(bookings, is(List.of(savedBooking1)));
     }
 
     @Test
@@ -256,8 +256,8 @@ class BookingStorageTest {
 
     @Test
     void findBookingsByOwnerIdAndStatus_ShouldReturnListOfBookingWithStatusWaitingWithPageable() {
-        List<Booking> bookings = bookingStorage.findBookingsByOwnerIdAndStatus(savedUser1.getId(), BookingStatus.WAITING
-        ,pageRequest);
+        List<Booking> bookings = bookingStorage.findBookingsByOwnerIdAndStatus(savedUser1.getId(), BookingStatus.WAITING,
+                pageRequest);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking3)));
@@ -309,7 +309,7 @@ class BookingStorageTest {
         List<Booking> bookings = bookingStorage.findPastBookingsByBookerId(savedUser2.getId(), now(), pageRequest);
 
         assertThat(bookings, notNullValue());
-        assertThat(bookings,is(List.of(savedBooking1)));
+        assertThat(bookings, is(List.of(savedBooking1)));
     }
 
     @Test
@@ -338,8 +338,8 @@ class BookingStorageTest {
 
     @Test
     void findBookingsByBookerIdAndStatus_ShouldReturnListOfBookingWithStatusWaitingWithPageable() {
-        List<Booking> bookings = bookingStorage.findBookingsByBookerIdAndStatus(savedUser1.getId(), BookingStatus.WAITING
-                ,pageRequest);
+        List<Booking> bookings = bookingStorage.findBookingsByBookerIdAndStatus(savedUser1.getId(), BookingStatus.WAITING,
+                pageRequest);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking3)));

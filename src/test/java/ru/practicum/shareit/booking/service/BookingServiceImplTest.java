@@ -52,7 +52,7 @@ class BookingServiceImplTest {
     private BookingServiceImpl bookingService;
 
     @Captor
-    private ArgumentCaptor<Booking>  bookingArgumentCaptor;
+    private ArgumentCaptor<Booking> bookingArgumentCaptor;
 
     @Captor
     private ArgumentCaptor<OffsetPageRequest> offsetPageRequestArgumentCaptor;
@@ -99,6 +99,7 @@ class BookingServiceImplTest {
                 .booker(booker)
                 .build();
     }
+
     @Test
     void addBooking_ItemAndUserFound_ShouldReturnBookingDto() {
         AddBookingDto addBookingDto = AddBookingDto.builder()
@@ -301,6 +302,7 @@ class BookingServiceImplTest {
         verify(bookingStorage, times(1)).findBookingById(bookingId);
         verify(bookingMapper, times(1)).toDto(booking);
     }
+
     @Test
     void getBookingById_RequesterIsItemOwner() {
         when(userStorage.findById(itemOwner.getId()))
@@ -326,7 +328,7 @@ class BookingServiceImplTest {
         NotAuthorizedException e = assertThrows(NotAuthorizedException.class,
                 () -> bookingService.getBookingById(unknownUserId, bookingId));
         assertThat(e.getMessage(), is("У пользователя с id '" + unknownUserId + "' нет прав для доступа к бронированию с" +
-                        " id '" + bookingId + "'."));
+                " id '" + bookingId + "'."));
 
         verify(userStorage, times(1)).findById(unknownUserId);
         verify(bookingStorage, times(1)).findBookingById(bookingId);

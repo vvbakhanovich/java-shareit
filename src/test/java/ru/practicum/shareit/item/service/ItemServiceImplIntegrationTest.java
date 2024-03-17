@@ -336,6 +336,7 @@ class ItemServiceImplIntegrationTest {
         assertThat(commentDto.getText(), is(addCommentDto.getText()));
         assertThat(commentDto.getCreated(), lessThan(LocalDateTime.now()));
     }
+
     @Test
     void addCommentToItem_WhenUserThatNotBookedItem_ShouldThrowItemUnavailableException() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
@@ -347,7 +348,6 @@ class ItemServiceImplIntegrationTest {
         assertThat(e.getMessage(), is("Пользователь с id '" + savedUser1.getId() + "' не брал в аренду вещь с id '" +
                 savedItem.getId() + "'."));
     }
-
 
 
     private void setUpBookings(long itemId) {

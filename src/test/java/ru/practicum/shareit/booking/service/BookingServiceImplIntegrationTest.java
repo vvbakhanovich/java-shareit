@@ -161,7 +161,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void acknowledgeBooking_WhenNotOwnerTryToApprove_ShouldThrowNotAuthorizedException () {
+    void acknowledgeBooking_WhenNotOwnerTryToApprove_ShouldThrowNotAuthorizedException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
         NotAuthorizedException e = assertThrows(NotAuthorizedException.class,
@@ -171,7 +171,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void acknowledgeBooking_WhenBookingStatusIsNotWaiting_ShouldThrowItemUnavailableException () {
+    void acknowledgeBooking_WhenBookingStatusIsNotWaiting_ShouldThrowItemUnavailableException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         bookingService.acknowledgeBooking(owner.getId(), addedBooking.getId(), true);
 
@@ -181,7 +181,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void acknowledgeBooking_WhenUserNotFound_ShouldThrowNotFoundException () {
+    void acknowledgeBooking_WhenUserNotFound_ShouldThrowNotFoundException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
         NotFoundException e = assertThrows(NotFoundException.class,
@@ -190,7 +190,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void acknowledgeBooking_WhenBookingNotFound_ShouldThrowNotFoundException () {
+    void acknowledgeBooking_WhenBookingNotFound_ShouldThrowNotFoundException() {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.acknowledgeBooking(owner.getId(), 999L, true));
         assertThat(e.getMessage(), is("Бронирование с id '999' не найдено."));
