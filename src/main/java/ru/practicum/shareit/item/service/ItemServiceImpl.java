@@ -8,7 +8,11 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingStorage;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.AddCommentDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.GetItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
@@ -24,9 +28,13 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import javax.transaction.Transactional;
-import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -117,11 +125,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Просмотр владельцем списка всех его вещей.
+     * Просмотр владельцем списка всех его вещей. Результат возвращается постранично. Для этого указываются два
+     * параметра:  from — индекс первого элемента, начиная с 0, и size — количество элементов для отображения.
      *
      * @param userId идентификатор пользователя, делающего запрос
-     * @param from
-     * @param size
+     * @param from   индекс первого отображаемого элемента, начиная с 0
+     * @param size   количество элементов для отображения
      * @return список вещей пользователя
      */
     @Override
@@ -141,11 +150,13 @@ public class ItemServiceImpl implements ItemService {
 
     /**
      * Поиск вещи потенциальным арендатором. Пользователь передаёт в строке запроса текст, и система ищет вещи,
-     * содержащие этот текст в названии или описании. Регистр текста не учитывается.
+     * содержащие этот текст в названии или описании. Регистр текста не учитывается. Результат возвращается постранично.
+     * Для этого указываются два параметра:  from — индекс первого элемента, начиная с 0, и size — количество элементов
+     * для отображения.
      *
      * @param text текстовый запрос
-     * @param from
-     * @param size
+     * @param from индекс первого отображаемого элемента, начиная с 0
+     * @param size количество элементов для отображения
      * @return список вещей, соответсвующих запросу
      */
     @Override
