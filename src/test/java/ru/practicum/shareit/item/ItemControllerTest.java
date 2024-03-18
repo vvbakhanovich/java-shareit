@@ -242,9 +242,11 @@ class ItemControllerTest {
 
     @Test
     @SneakyThrows
-    void searchItems_ShouldReturnStatus200() {
+    void searchItems_WithoutParams_ShouldReturnStatus200() {
         String text = "search";
-        when(itemService.searchItems(text))
+        long from = 0;
+        int size = 10;
+        when(itemService.searchItems(text, from, size))
                 .thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items/search")
@@ -256,14 +258,39 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.[0].name", is(itemDto.getName())))
                 .andExpect(jsonPath("$.[0].available", is(itemDto.getAvailable())));
 
-        verify(itemService, times(1)).searchItems(text);
+        verify(itemService, times(1)).searchItems(text, from, size);
+    }
+
+    @Test
+    @SneakyThrows
+    void searchItems_WithParams_ShouldReturnStatus200() {
+        String text = "search";
+        long from = 1;
+        int size = 5;
+        when(itemService.searchItems(text, from, size))
+                .thenReturn(List.of(itemDto));
+
+        mvc.perform(get("/items/search")
+                        .header(header, userId)
+                        .param("text", text)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(itemDto))))
+                .andExpect(jsonPath("$.[0].name", is(itemDto.getName())))
+                .andExpect(jsonPath("$.[0].available", is(itemDto.getAvailable())));
+
+        verify(itemService, times(1)).searchItems(text, from, size);
     }
 
     @Test
     @SneakyThrows
     void searchItems_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
+        long from = 0;
+        int size = 10;
         String text = "search";
-        when(itemService.searchItems(text))
+        when(itemService.searchItems(text, from, size))
                 .thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items/search")
@@ -271,14 +298,16 @@ class ItemControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
-        verify(itemService, never()).searchItems(any());
+        verify(itemService, never()).searchItems(any(), any(), any());
     }
 
     @Test
     @SneakyThrows
     void searchItems_WithoutText_ShouldThrowMissingServletRequestParameterExceptionExceptionAndStatus400() {
+        long from = 0;
+        int size = 10;
         String text = "search";
-        when(itemService.searchItems(text))
+        when(itemService.searchItems(text, from, size))
                 .thenReturn(List.of(itemDto));
 
         mvc.perform(get("/items/search")
@@ -287,7 +316,7 @@ class ItemControllerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof
                         MissingServletRequestParameterException));
 
-        verify(itemService, never()).searchItems(any());
+        verify(itemService, never()).searchItems(any(), any(), any());
     }
 
     @Test

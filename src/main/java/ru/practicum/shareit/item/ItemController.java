@@ -52,8 +52,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
-        return itemService.searchItems(text);
+    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text,
+                                     @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
+                                     @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @Positive Integer size) {
+        return itemService.searchItems(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

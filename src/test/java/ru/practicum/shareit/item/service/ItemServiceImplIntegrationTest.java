@@ -301,9 +301,11 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     void searchItems_ShouldReturnItemsContainingTextInTitleOrDescription() {
+        long from = 0;
+        int size = 10;
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
-        List<ItemDto> items = itemService.searchItems("Dto");
+        List<ItemDto> items = itemService.searchItems("Dto", from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -312,10 +314,24 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
-    void searchItems_TextUpperCase_ShouldReturnItemsContainingTextInTitleOrDescription() {
+    void searchItems_From1_ShouldReturnEmptyList() {
+        long from = 1;
+        int size = 10;
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
-        List<ItemDto> items = itemService.searchItems("DTO");
+        List<ItemDto> items = itemService.searchItems("Dto", from, size);
+
+        assertThat(items, notNullValue());
+        assertThat(items.size(), is(0));
+    }
+
+    @Test
+    void searchItems_TextUpperCase_ShouldReturnItemsContainingTextInTitleOrDescription() {
+        long from = 0;
+        int size = 10;
+        ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
+
+        List<ItemDto> items = itemService.searchItems("DTO", from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -325,9 +341,11 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     void searchItems_SearchOnlyDescription_ShouldReturnItemsContainingTextInTitleOrDescription() {
+        long from = 0;
+        int size = 10;
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
-        List<ItemDto> items = itemService.searchItems("DEScripTioN");
+        List<ItemDto> items = itemService.searchItems("DEScripTioN", from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -337,6 +355,8 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     void searchItems_WhenItemUnavailable_ShouldReturnEmptyList() {
+        long from = 1;
+        int size = 4;
         ItemDto unavailableItemDto = ItemDto.builder()
                 .name("itemDto")
                 .description("itemDto description")
@@ -344,7 +364,7 @@ class ItemServiceImplIntegrationTest {
                 .build();
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), unavailableItemDto);
 
-        List<ItemDto> items = itemService.searchItems("DEScripTioN");
+        List<ItemDto> items = itemService.searchItems("DEScripTioN", from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(0));

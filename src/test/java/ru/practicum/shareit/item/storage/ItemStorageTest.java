@@ -107,8 +107,9 @@ class ItemStorageTest {
     @Test
     void searchInTitleAndDescription_WhenSearchInTitle_ShouldReturnAllItems() {
         String text = "%name%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
 
-        List<Item> items = itemStorage.searchInTitleAndDescription(text);
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));
@@ -116,10 +117,35 @@ class ItemStorageTest {
     }
 
     @Test
+    void searchInTitleAndDescription_WhenSearchInTitleAndFrom1_ShouldReturnAllItems() {
+        String text = "%name%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(1L, 5);
+
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
+
+        assertThat(items, notNullValue());
+        assertThat(items.size(), is(1));
+        assertThat(items, is(List.of(savedItem3)));
+    }
+
+    @Test
+    void searchInTitleAndDescription_WhenSearchInTitleAndSize1_ShouldReturnAllItems() {
+        String text = "%name%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 1);
+
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
+
+        assertThat(items, notNullValue());
+        assertThat(items.size(), is(1));
+        assertThat(items, is(List.of(savedItem1)));
+    }
+
+    @Test
     void searchInTitleAndDescription_WhenSearchInTitle2_ShouldReturnAllItems() {
         String text = "%name 3%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
 
-        List<Item> items = itemStorage.searchInTitleAndDescription(text);
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -129,8 +155,9 @@ class ItemStorageTest {
     @Test
     void searchInTitleAndDescription_WhenSearchInDescription_ShouldReturnAllItems() {
         String text = "%description%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
 
-        List<Item> items = itemStorage.searchInTitleAndDescription(text);
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));
@@ -140,8 +167,9 @@ class ItemStorageTest {
     @Test
     void searchInTitleAndDescription_WhenSearchInDescription2_ShouldReturnAllItems() {
         String text = "%description 3%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
 
-        List<Item> items = itemStorage.searchInTitleAndDescription(text);
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -151,8 +179,9 @@ class ItemStorageTest {
     @Test
     void searchInTitleAndDescription_WhenSearchTextIsEmpty_ShouldReturnAllItems() {
         String text = "%%";
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
 
-        List<Item> items = itemStorage.searchInTitleAndDescription(text);
+        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));

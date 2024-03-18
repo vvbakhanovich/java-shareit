@@ -11,6 +11,7 @@ public interface ItemStorage extends JpaRepository<Item, Long> {
 
     List<Item> findAllByOwnerIdOrderById(Long userId, Pageable pageable);
 
-    @Query("SELECT i FROM Item i WHERE (LOWER(i.name) LIKE ?1 OR LOWER(i.description) LIKE ?1) AND i.available = true")
-    List<Item> searchInTitleAndDescription(String text);
+    @Query(value = "SELECT i FROM Item i WHERE (LOWER(i.name) LIKE ?1 OR LOWER(i.description) LIKE ?1) AND i.available = true",
+    countQuery = "SELECT COUNT(i) FROM Item i WHERE (LOWER(i.name) LIKE ?1 OR LOWER(i.description) LIKE ?1) AND i.available = true")
+    List<Item> searchInTitleAndDescription(String text, Pageable pageable);
 }

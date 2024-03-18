@@ -740,51 +740,67 @@ class ItemServiceImplTest {
 
     @Test
     void searchItems_WhenTextIsNotBlank_ShouldReturnListOfItems() {
+        long from = 1;
+        int size = 4;
         String text = "search";
-        when(itemStorage.searchInTitleAndDescription(any()))
+        when(itemStorage.searchInTitleAndDescription(any(), any()))
                 .thenReturn(List.of(item));
 
-        itemService.searchItems(text);
+        itemService.searchItems(text, from, size);
 
-        verify(itemStorage, times(1)).searchInTitleAndDescription(stringArgumentCaptor.capture());
+        verify(itemStorage, times(1)).searchInTitleAndDescription(stringArgumentCaptor.capture(),
+                offsetPageRequestArgumentCaptor.capture());
         String captorValue = stringArgumentCaptor.getValue();
         assertThat(captorValue, is("%search%"));
+        OffsetPageRequest offsetPageRequest = offsetPageRequestArgumentCaptor.getValue();
+        assertThat(offsetPageRequest.getOffset(), is(from));
+        assertThat(offsetPageRequest.getPageSize(), is(size));
         verify(itemMapper, times(1)).toDtoList(any());
     }
 
     @Test
     void searchItems_WhenTextUpperCase_ShouldReturnListOfItems() {
+        long from = 1;
+        int size = 4;
         String text = "SEArcH";
-        when(itemStorage.searchInTitleAndDescription(any()))
+        when(itemStorage.searchInTitleAndDescription(any(), any()))
                 .thenReturn(List.of(item));
 
-        itemService.searchItems(text);
+        itemService.searchItems(text, from, size);
 
-        verify(itemStorage, times(1)).searchInTitleAndDescription(stringArgumentCaptor.capture());
+        verify(itemStorage, times(1)).searchInTitleAndDescription(stringArgumentCaptor.capture(),
+                offsetPageRequestArgumentCaptor.capture());
         String captorValue = stringArgumentCaptor.getValue();
         assertThat(captorValue, is("%search%"));
+        OffsetPageRequest offsetPageRequest = offsetPageRequestArgumentCaptor.getValue();
+        assertThat(offsetPageRequest.getOffset(), is(from));
+        assertThat(offsetPageRequest.getPageSize(), is(size));
         verify(itemMapper, times(1)).toDtoList(any());
     }
 
     @Test
     void searchItems_WhenTextIsEmpty_ShouldReturnListOfItems() {
+        long from = 1;
+        int size = 4;
         String text = "";
 
-        List<ItemDto> items = itemService.searchItems(text);
+        List<ItemDto> items = itemService.searchItems(text, from, size);
 
         assertThat(items, is(Collections.emptyList()));
-        verify(itemStorage, never()).searchInTitleAndDescription(any());
+        verify(itemStorage, never()).searchInTitleAndDescription(any(), any());
         verify(itemMapper, never()).toDtoList(any());
     }
 
     @Test
     void searchItems_WhenTextIsOnlyWhitespaces_ShouldReturnListOfItems() {
+        long from = 1;
+        int size = 4;
         String text = "   ";
 
-        List<ItemDto> items = itemService.searchItems(text);
+        List<ItemDto> items = itemService.searchItems(text, from, size);
 
         assertThat(items, is(Collections.emptyList()));
-        verify(itemStorage, never()).searchInTitleAndDescription(any());
+        verify(itemStorage, never()).searchInTitleAndDescription(any(), any());
         verify(itemMapper, never()).toDtoList(any());
     }
 

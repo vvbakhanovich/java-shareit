@@ -24,6 +24,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
 import javax.transaction.Transactional;
+import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -143,16 +144,19 @@ public class ItemServiceImpl implements ItemService {
      * содержащие этот текст в названии или описании. Регистр текста не учитывается.
      *
      * @param text текстовый запрос
+     * @param from
+     * @param size
      * @return список вещей, соответсвующих запросу
      */
     @Override
-    public List<ItemDto> searchItems(final String text) {
+    public List<ItemDto> searchItems(final String text, Long from, Integer size) {
         log.info("Поиск вещей по запросу: {}.", text);
         if (text.isBlank()) {
             return Collections.emptyList();
         }
         String searchText = "%" + text.toLowerCase() + "%";
-        final Iterable<Item> searchResult = itemStorage.searchInTitleAndDescription(searchText);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        final Iterable<Item> searchResult = itemStorage.searchInTitleAndDescription(searchText, pageRequest);
         return itemMapper.toDtoList(Lists.newArrayList(searchResult));
     }
 
