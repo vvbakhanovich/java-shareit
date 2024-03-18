@@ -165,27 +165,11 @@ class BookingStorageTest {
     }
 
     @Test
-    void findAllByItemOwnerId_ShouldReturnListOfBookingsOrderByStartDesc() {
-        List<Booking> bookings = bookingStorage.findAllByItemOwnerId(savedUser1.getId());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking3, savedBooking2, savedBooking1)));
-    }
-
-    @Test
     void findAllByItemOwnerId_WithPageable_ShouldReturnListOfBookingsOrderByStartDesc() {
         List<Booking> bookings = bookingStorage.findAllByItemOwnerId(savedUser1.getId(), pageRequest);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking3)));
-    }
-
-    @Test
-    void findAllByItemOwnerId_OwnerNotFound_ShouldReturnEmptyList() {
-        List<Booking> bookings = bookingStorage.findAllByItemOwnerId(999L);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, emptyIterable());
     }
 
     @Test
@@ -197,29 +181,12 @@ class BookingStorageTest {
     }
 
     @Test
-    void findCurrentBookingsByOwnerId_ShouldReturnListOfBookingWhereStartIsBeforeNowAndEndAfterNow() {
-        List<Booking> bookings = bookingStorage.findCurrentBookingsByOwnerId(savedUser1.getId(), now(), now());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking2)));
-    }
-
-    @Test
     void findCurrentBookingsByOwnerId_ShouldReturnListOfBookingWhereStartIsBeforeNowAndEndAfterNowWithPageable() {
         List<Booking> bookings = bookingStorage.findCurrentBookingsByOwnerId(savedUser1.getId(), now(), now(),
                 pageRequest);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking2)));
-    }
-
-
-    @Test
-    void findPastBookingsByOwnerId_ShouldReturnListOfBookingWhereEndBeforeNow() {
-        List<Booking> bookings = bookingStorage.findPastBookingsByOwnerId(savedUser1.getId(), now());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking1)));
     }
 
     @Test
@@ -231,27 +198,11 @@ class BookingStorageTest {
     }
 
     @Test
-    void findFutureBookingsByOwnerId_ShouldReturnBookingWhereStartIsAfterNow() {
-        List<Booking> bookings = bookingStorage.findFutureBookingsByOwnerId(savedUser1.getId(), now());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking3)));
-    }
-
-    @Test
     void findFutureBookingsByOwnerId_ShouldReturnBookingWhereStartIsAfterNowWithPageable() {
         List<Booking> bookings = bookingStorage.findFutureBookingsByOwnerId(savedUser1.getId(), now(), pageRequest);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking3)));
-    }
-
-    @Test
-    void findBookingsByOwnerIdAndStatus_ShouldReturnListOfBookingWithStatusWaiting() {
-        List<Booking> bookings = bookingStorage.findBookingsByOwnerIdAndStatus(savedUser1.getId(), BookingStatus.WAITING);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking3, savedBooking2, savedBooking1)));
     }
 
     @Test
@@ -264,24 +215,8 @@ class BookingStorageTest {
     }
 
     @Test
-    void findAllByBookerId_ShouldReturnListOfBookingsOrderByStartDesc() {
-        List<Booking> bookings = bookingStorage.findAllByBookerId(savedUser2.getId());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking2, savedBooking1)));
-    }
-
-    @Test
     void findAllByBookerId_WithPageable_ShouldReturnListOfBookingsOrderByStartDesc() {
         List<Booking> bookings = bookingStorage.findAllByBookerId(savedUser2.getId(), pageRequest);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking2)));
-    }
-
-    @Test
-    void findCurrentBookingsByBookerId_ShouldReturnListOfBookingWhereStartIsBeforeNowAndEndAfterNow() {
-        List<Booking> bookings = bookingStorage.findCurrentBookingsByBookerId(savedUser2.getId(), now(), now());
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking2)));
@@ -297,14 +232,6 @@ class BookingStorageTest {
     }
 
     @Test
-    void findPastBookingsByBookerId_ShouldReturnListOfBookingWhereEndBeforeNow() {
-        List<Booking> bookings = bookingStorage.findPastBookingsByBookerId(savedUser2.getId(), now());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking1)));
-    }
-
-    @Test
     void findPastBookingsByBookerId_ShouldReturnListOfBookingWhereEndBeforeNowWithPageable() {
         List<Booking> bookings = bookingStorage.findPastBookingsByBookerId(savedUser2.getId(), now(), pageRequest);
 
@@ -313,27 +240,11 @@ class BookingStorageTest {
     }
 
     @Test
-    void findFutureBookingsByBookerId_ShouldReturnBookingWhereStartIsAfterNow() {
-        List<Booking> bookings = bookingStorage.findFutureBookingsByBookerId(savedUser1.getId(), now());
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking3)));
-    }
-
-    @Test
     void findFutureBookingsByBookerId_ShouldReturnBookingWhereStartIsAfterNowWithPageable() {
         List<Booking> bookings = bookingStorage.findFutureBookingsByOwnerId(savedUser1.getId(), now(), pageRequest);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(savedBooking3)));
-    }
-
-    @Test
-    void findBookingsByBookerIdAndStatus_ShouldReturnListOfBookingWithStatusWaiting() {
-        List<Booking> bookings = bookingStorage.findBookingsByBookerIdAndStatus(savedUser2.getId(), BookingStatus.WAITING);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(savedBooking2, savedBooking1)));
     }
 
     @Test

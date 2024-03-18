@@ -17,8 +17,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -26,6 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 public class ItemRequestController {
+
+    private static final String DEFAULT_PAGE_SIZE = "10";
 
     private final ItemRequestService itemRequestService;
 
@@ -43,8 +43,8 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDto> getAvailableItemRequests(@RequestHeader("X-Sharer-User-id") Long userId,
-                                                         @RequestParam(required = false) @PositiveOrZero Long from,
-                                                         @RequestParam(required = false) @Positive Integer size) {
+                                                         @RequestParam(defaultValue = "0") Long from,
+                                                         @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) Integer size) {
         return itemRequestService.getAvailableItemRequests(userId, from, size);
     }
 

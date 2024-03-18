@@ -209,10 +209,12 @@ class BookingControllerTest {
 
     @Test
     @SneakyThrows
-    void getAllBookingsFromUser_WithoutRequiredParams_ShouldReturnStatus200() {
+    void getAllBookingsFromUser_WithoutParams_ShouldReturnStatus200() {
+        long from = 0;
+        int size = 10;
         GetBookingState state = GetBookingState.ALL;
         boolean isOwner = false;
-        when(bookingService.getAllBookingsFromUser(userId, state, null, null, isOwner))
+        when(bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings")
@@ -221,7 +223,29 @@ class BookingControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
 
-        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, null, null,
+        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size,
+                isOwner);
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllBookingsFromUser_WithParams_ShouldReturnStatus200() {
+        long from = 2;
+        int size = 5;
+        GetBookingState state = GetBookingState.ALL;
+        boolean isOwner = false;
+        when(bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner))
+                .thenReturn(List.of(bookingDto));
+
+        mvc.perform(get("/bookings")
+                        .header(header, userId)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
+
+        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size,
                 isOwner);
     }
 
@@ -285,10 +309,12 @@ class BookingControllerTest {
 
     @Test
     @SneakyThrows
-    void getAllOwnerBookings_WithoutRequiredParams_ShouldReturnStatus200() {
+    void getAllOwnerBookings_WithoutParams_ShouldReturnStatus200() {
+        Long from = 0L;
+        Integer size = 10;
         GetBookingState state = GetBookingState.ALL;
         boolean isOwner = true;
-        when(bookingService.getAllBookingsFromUser(userId, state, null, null, isOwner))
+        when(bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner))
                 .thenReturn(List.of(bookingDto));
 
         mvc.perform(get("/bookings/owner")
@@ -297,7 +323,7 @@ class BookingControllerTest {
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
 
-        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, null, null,
+        verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size,
                 isOwner);
     }
 

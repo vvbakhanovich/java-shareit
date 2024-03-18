@@ -70,9 +70,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestDto> getAvailableItemRequests(final Long userId, final Long from, final Integer size) {
         findUser(userId);
-        if (from == null && size == null) {
-            return itemRequestMapper.toDtoList(itemRequestStorage.findAllRequests());
-        }
         final OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
         final Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(userId, pageRequest);
         log.info("Получение списка запросов, начиная с '{}', по '{}' элемента на странице.", from, size);

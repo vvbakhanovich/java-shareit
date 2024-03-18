@@ -245,20 +245,6 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getAllBookingsFromUser_WhenRequesterIsOwnerStateAllFromAndSizeAreNull_ShouldReturnAllBooking() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto acknowledgedBooking = bookingService.acknowledgeBooking(owner.getId(), addedBooking2.getId(),
-                true);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.ALL, null,
-                null, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(acknowledgedBooking, addedBooking)));
-    }
-
-    @Test
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateAllFrom1Size1_ShouldReturnAllBooking() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -268,19 +254,6 @@ class BookingServiceImplIntegrationTest {
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(addedBooking)));
-    }
-
-    @Test
-    void getAllBookingsFromUser_WhenRequesterIsBookerStateAllFromAndSizeAreNull_ShouldReturnAllBooking() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.ALL, null,
-                null, false);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking3)));
     }
 
     @Test
@@ -297,36 +270,12 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getAllBookingsFromUser_WhenRequesterIsOwnerStateCurrentFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.CURRENT, null,
-                null, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking)));
-    }
-
-    @Test
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateCurrentFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
 
         List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.CURRENT, 0L,
                 1, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking)));
-    }
-
-    @Test
-    void getAllBookingsFromUser_WhenRequesterIsBookerStateCurrentFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(booker.getId(), GetBookingState.CURRENT, null,
-                null, false);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(addedBooking)));
@@ -345,19 +294,6 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getAllBookingsFromUser_WhenRequesterIsOwnerStatePastFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(booker.getId(), GetBookingState.PAST, null,
-                null, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking3)));
-    }
-
-    @Test
     void getAllBookingsFromUser_WhenRequesterIsOwnerStatePastFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -365,19 +301,6 @@ class BookingServiceImplIntegrationTest {
 
         List<BookingDto> bookings = bookingService.getAllBookingsFromUser(booker.getId(), GetBookingState.PAST, 0L,
                 1, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking3)));
-    }
-
-    @Test
-    void getAllBookingsFromUser_WhenRequesterIsBookerStatePastFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.PAST, null,
-                null, false);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(addedBooking3)));
@@ -397,19 +320,6 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getAllBookingsFromUser_WhenRequesterIsOwnerStateFutureFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.FUTURE, null,
-                null, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking2)));
-    }
-
-    @Test
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateFutureFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -417,19 +327,6 @@ class BookingServiceImplIntegrationTest {
 
         List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.FUTURE, 0L,
                 1, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking2)));
-    }
-
-    @Test
-    void getAllBookingsFromUser_WhenRequesterIsBookerStateFutureFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(booker.getId(), GetBookingState.FUTURE, null,
-                null, false);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(addedBooking2)));
@@ -449,20 +346,6 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getAllBookingsFromUser_WhenRequesterIsOwnerStateWaitingFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-        bookingService.acknowledgeBooking(owner.getId(), addedBooking2.getId(), true);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.WAITING, null,
-                null, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking)));
-    }
-
-    @Test
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateWaitingFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -471,20 +354,6 @@ class BookingServiceImplIntegrationTest {
 
         List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.WAITING, 0L,
                 1, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(addedBooking)));
-    }
-
-    @Test
-    void getAllBookingsFromUser_WhenRequesterIsBookerStateWaitingFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-        bookingService.acknowledgeBooking(owner.getId(), addedBooking2.getId(), true);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(booker.getId(), GetBookingState.WAITING, null,
-                null, false);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(addedBooking)));
@@ -505,20 +374,6 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
-    void getAllBookingsFromUser_WhenRequesterIsOwnerStateRejectedFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-        BookingDto acknowledgedBooking = bookingService.acknowledgeBooking(owner.getId(), addedBooking.getId(), false);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.REJECTED, null,
-                null, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(acknowledgedBooking)));
-    }
-
-    @Test
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateRejectedFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -527,20 +382,6 @@ class BookingServiceImplIntegrationTest {
 
         List<BookingDto> bookings = bookingService.getAllBookingsFromUser(owner.getId(), GetBookingState.REJECTED, 0L,
                 1, true);
-
-        assertThat(bookings, notNullValue());
-        assertThat(bookings, is(List.of(acknowledgedBooking)));
-    }
-
-    @Test
-    void getAllBookingsFromUser_WhenRequesterIsBookerStateRejectedFromAndSizeAreNull_ShouldReturnAllCurrentBookings() {
-        BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
-        BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
-        BookingDto addedBooking3 = bookingService.addBooking(owner.getId(), addBookingDto3);
-        BookingDto acknowledgedBooking = bookingService.acknowledgeBooking(owner.getId(), addedBooking.getId(), false);
-
-        List<BookingDto> bookings = bookingService.getAllBookingsFromUser(booker.getId(), GetBookingState.REJECTED, null,
-                null, false);
 
         assertThat(bookings, notNullValue());
         assertThat(bookings, is(List.of(acknowledgedBooking)));

@@ -146,47 +146,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Iterable<Booking> getBookingFromOwner(Long userId, GetBookingState state, Long from, Integer size, Iterable<Booking> result) {
-        if (from == null && size == null) {
-            result = getAllSortedBookingsFromUser(state, result, userId);
-        } else {
-            OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
-            result = getAllSortedBookingsFromUser(state, result, userId, pageRequest);
-        }
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        result = getAllSortedBookingsFromUser(state, result, userId, pageRequest);
         return result;
     }
 
     private Iterable<Booking> getBookingFromUser(Long userId, GetBookingState state, Long from, Integer size, Iterable<Booking> result) {
-        if (from == null && size == null) {
-            result = getAllSortedBookingsFromBooker(state, result, userId);
-        } else {
-            OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
-            result = getAllSortedBookingsFromBooker(state, result, userId, pageRequest);
-        }
-        return result;
-    }
-
-    private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
-                                                           final Long userId) {
-        switch (state) {
-            case ALL:
-                result = bookingStorage.findAllByItemOwnerId(userId);
-                break;
-            case CURRENT:
-                result = bookingStorage.findCurrentBookingsByOwnerId(userId, LocalDateTime.now(), LocalDateTime.now());
-                break;
-            case PAST:
-                result = bookingStorage.findPastBookingsByOwnerId(userId, LocalDateTime.now());
-                break;
-            case FUTURE:
-                result = bookingStorage.findFutureBookingsByOwnerId(userId, LocalDateTime.now());
-                break;
-            case WAITING:
-                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.WAITING);
-                break;
-            case REJECTED:
-                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED);
-                break;
-        }
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        result = getAllSortedBookingsFromBooker(state, result, userId, pageRequest);
         return result;
     }
 
@@ -211,31 +178,6 @@ public class BookingServiceImpl implements BookingService {
                 break;
             case REJECTED:
                 result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED, pageable);
-                break;
-        }
-        return result;
-    }
-
-    private Iterable<Booking> getAllSortedBookingsFromBooker(final GetBookingState state, Iterable<Booking> result,
-                                                             final Long bookerId) {
-        switch (state) {
-            case ALL:
-                result = bookingStorage.findAllByBookerId(bookerId);
-                break;
-            case CURRENT:
-                result = bookingStorage.findCurrentBookingsByBookerId(bookerId, LocalDateTime.now(), LocalDateTime.now());
-                break;
-            case PAST:
-                result = bookingStorage.findPastBookingsByBookerId(bookerId, LocalDateTime.now());
-                break;
-            case FUTURE:
-                result = bookingStorage.findFutureBookingsByBookerId(bookerId, LocalDateTime.now());
-                break;
-            case WAITING:
-                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.WAITING);
-                break;
-            case REJECTED:
-                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.REJECTED);
                 break;
         }
         return result;

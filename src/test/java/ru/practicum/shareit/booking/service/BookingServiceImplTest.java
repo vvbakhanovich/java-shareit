@@ -366,24 +366,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNullStateAll_ShouldReturnListOfBookings() {
-        GetBookingState state = ALL;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = true;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        when(bookingStorage.findAllByItemOwnerId(userId))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findAllByItemOwnerId(userId);
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateAll_ShouldReturnListOfBookings() {
         GetBookingState state = ALL;
         Long from = 1L;
@@ -403,26 +385,6 @@ class BookingServiceImplTest {
         assertThat(captorValue.getOffset(), is(from));
         assertThat(captorValue.getPageSize(), is(size));
 
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
-    void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNullStateCurrent_ShouldReturnListOfBookings() {
-        GetBookingState state = CURRENT;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = true;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findCurrentBookingsByOwnerId(eq(userId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findCurrentBookingsByOwnerId(eq(userId), any(LocalDateTime.class),
-                any(LocalDateTime.class));
         verify(bookingMapper, times(1)).toDtoList(List.of(booking));
     }
 
@@ -450,25 +412,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNullStatePast_ShouldReturnListOfBookings() {
-        GetBookingState state = PAST;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = true;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findPastBookingsByOwnerId(eq(userId), any(LocalDateTime.class)))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findPastBookingsByOwnerId(eq(userId), any(LocalDateTime.class));
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStatePast_ShouldReturnListOfBookings() {
         GetBookingState state = PAST;
         Long from = 1L;
@@ -488,25 +431,6 @@ class BookingServiceImplTest {
         assertThat(captorValue.getOffset(), is(from));
         assertThat(captorValue.getPageSize(), is(size));
 
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
-    void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNullStateFuture_ShouldReturnListOfBookings() {
-        GetBookingState state = FUTURE;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = true;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findFutureBookingsByOwnerId(eq(userId), any(LocalDateTime.class)))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findFutureBookingsByOwnerId(eq(userId), any(LocalDateTime.class));
         verify(bookingMapper, times(1)).toDtoList(List.of(booking));
     }
 
@@ -534,25 +458,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNullStateWaiting_ShouldReturnListOfBookings() {
-        GetBookingState state = WAITING;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = true;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.WAITING))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findBookingsByOwnerIdAndStatus(userId, BookingStatus.WAITING);
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateWaiting_ShouldReturnListOfBookings() {
         GetBookingState state = WAITING;
         Long from = 1L;
@@ -576,25 +481,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNullStateRejected_ShouldReturnListOfBookings() {
-        GetBookingState state = REJECTED;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = true;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED);
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateRejected_ShouldReturnListOfBookings() {
         GetBookingState state = REJECTED;
         Long from = 1L;
@@ -614,26 +500,6 @@ class BookingServiceImplTest {
         assertThat(captorValue.getOffset(), is(from));
         assertThat(captorValue.getPageSize(), is(size));
 
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    //-----------------------------------------------------------------------------------------------
-
-    @Test
-    void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNullStateAll_ShouldReturnListOfBookings() {
-        GetBookingState state = ALL;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = false;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        when(bookingStorage.findAllByBookerId(userId))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findAllByBookerId(userId);
         verify(bookingMapper, times(1)).toDtoList(List.of(booking));
     }
 
@@ -661,25 +527,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNullStateCurrent_ShouldReturnListOfBookings() {
-        GetBookingState state = CURRENT;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = false;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        when(bookingStorage.findCurrentBookingsByBookerId(eq(userId), any(LocalDateTime.class), any(LocalDateTime.class)))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findCurrentBookingsByBookerId(eq(userId), any(LocalDateTime.class),
-                any(LocalDateTime.class));
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateCurrent_ShouldReturnListOfBookings() {
         GetBookingState state = CURRENT;
         Long from = 1L;
@@ -699,24 +546,6 @@ class BookingServiceImplTest {
         assertThat(captorValue.getOffset(), is(from));
         assertThat(captorValue.getPageSize(), is(size));
 
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
-    void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNullStatePast_ShouldReturnListOfBookings() {
-        GetBookingState state = PAST;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = false;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        when(bookingStorage.findPastBookingsByBookerId(eq(userId), any(LocalDateTime.class)))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findPastBookingsByBookerId(eq(userId), any(LocalDateTime.class));
         verify(bookingMapper, times(1)).toDtoList(List.of(booking));
     }
 
@@ -744,25 +573,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNullStateFuture_ShouldReturnListOfBookings() {
-        GetBookingState state = FUTURE;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = false;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findFutureBookingsByBookerId(eq(userId), any(LocalDateTime.class)))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findFutureBookingsByBookerId(eq(userId), any(LocalDateTime.class));
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateFuture_ShouldReturnListOfBookings() {
         GetBookingState state = FUTURE;
         Long from = 1L;
@@ -786,25 +596,6 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNullStateWaiting_ShouldReturnListOfBookings() {
-        GetBookingState state = WAITING;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = false;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        when(bookingStorage.findBookingsByBookerIdAndStatus(userId, BookingStatus.WAITING))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findBookingsByBookerIdAndStatus(userId, BookingStatus.WAITING);
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateWaiting_ShouldReturnListOfBookings() {
         GetBookingState state = WAITING;
         Long from = 1L;
@@ -824,24 +615,6 @@ class BookingServiceImplTest {
         assertThat(captorValue.getOffset(), is(from));
         assertThat(captorValue.getPageSize(), is(size));
 
-        verify(bookingMapper, times(1)).toDtoList(List.of(booking));
-    }
-
-    @Test
-    void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNullStateRejected_ShouldReturnListOfBookings() {
-        GetBookingState state = REJECTED;
-        Long from = null;
-        Integer size = null;
-        boolean isOwner = false;
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-        when(bookingStorage.findBookingsByBookerIdAndStatus(userId, BookingStatus.REJECTED))
-                .thenReturn(List.of(booking));
-
-        bookingService.getAllBookingsFromUser(userId, state, from, size, isOwner);
-
-        verify(userStorage, times(1)).findById(userId);
-        verify(bookingStorage, times(1)).findBookingsByBookerIdAndStatus(userId, BookingStatus.REJECTED);
         verify(bookingMapper, times(1)).toDtoList(List.of(booking));
     }
 
