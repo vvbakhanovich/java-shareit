@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.AddBookingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -13,6 +14,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingStorage;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotAuthorizedException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
@@ -84,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
                     "' не является владельцем вещи с id '" + item.getId() + "'.");
         }
         if (!booking.getStatus().equals(BookingStatus.WAITING)) {
-            throw new ItemUnavailableException("Вещь уже находится в аренде.");
+            throw new ItemUnavailableException("Текущий статус бронирования не позволяет сделать подтверждение.");
         }
         if (approved) {
             booking.setStatus(BookingStatus.APPROVED);
@@ -115,37 +117,96 @@ public class BookingServiceImpl implements BookingService {
     }
 
     /**
-     * Получение списка всех бронирований текущего пользователя. Параметр state необязательный и по умолчанию равен ALL.
-     * Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
-     * отсортированными по дате от более новых к более старым.
-     *
-     * @param userId идентификатор пользователя, делающего запрос
-     * @param state  статус бронирования
-     * @return список бронирований
-     */
-    @Override
-    public List<BookingDto> getAllOwnerBookings(final Long userId, final GetBookingState state) {
-        findUser(userId);
-        final Iterable<Booking> result = new ArrayList<>();
-        final Iterable<Booking> allOwnerBookings = getAllSortedBookingsFromUser(state, result, userId);
-        return bookingMapper.toDtoList(Lists.newArrayList(allOwnerBookings));
-    }
-
-    /**
-     * Получение списка бронирований для всех вещей текущего пользователя. Параметр state необязательный и по умолчанию
+     * Получение списка бронирований для всех вещей пользователя. Параметр state необязательный и по умолчанию
      * равен ALL. Также он может принимать значения CURRENT, PAST, FUTURE, WAITING, REJECTED. Бронирования возвращаются
-     * отсортированными по дате от более новых к более старым.
+     * отсортированными по дате от более новых к более старым. При наличии параметров from и size результат отображается
+     * постранично, начиная с элемента под номером from по количеству элементов на странице, равному size. Флаг isOwner
+     * определяет то, какие бронирования увидит пользователь. Если true, то будет получен список собственных
+     * бронирований, если false, то будет получен список бронирований остальных пользователей.
      *
-     * @param userId идентификатор пользователя, делающего запрос
-     * @param state  статус бронирования
+     * @param userId  идентификатор пользователя, делающего запрос
+     * @param state   статус бронирования
+     * @param from    индекс индекс первого отображаемого элемента (отсчет начинается с нуля)
+     * @param size    количество отображаемых элементов на странице
+     * @param isOwner флаг, хочет ли запрашивающий пользователь посмотреть свои бронирования (true) или список
+     *                бронирований других пользователей
      * @return список бронирований
      */
     @Override
-    public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state) {
+    public List<BookingDto> getAllBookingsFromUser(final Long userId, final GetBookingState state, Long from,
+                                                   Integer size, boolean isOwner) {
         findUser(userId);
         Iterable<Booking> result = new ArrayList<>();
-        result = getAllSortedBookingsFromBooker(state, result, userId);
+        if (isOwner) {
+            result = getBookingFromOwner(userId, state, from, size, result);
+        } else {
+            result = getBookingFromUser(userId, state, from, size, result);
+        }
         return bookingMapper.toDtoList(Lists.newArrayList(result));
+    }
+
+    private Iterable<Booking> getBookingFromOwner(Long userId, GetBookingState state, Long from, Integer size, Iterable<Booking> result) {
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        result = getAllSortedBookingsFromUser(state, result, userId, pageRequest);
+        return result;
+    }
+
+    private Iterable<Booking> getBookingFromUser(Long userId, GetBookingState state, Long from, Integer size, Iterable<Booking> result) {
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        result = getAllSortedBookingsFromBooker(state, result, userId, pageRequest);
+        return result;
+    }
+
+    private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
+                                                           final Long userId, Pageable pageable) {
+        switch (state) {
+            case ALL:
+                result = bookingStorage.findAllByItemOwnerId(userId, pageable);
+                break;
+            case CURRENT:
+                result = bookingStorage.findCurrentBookingsByOwnerId(userId, LocalDateTime.now(), LocalDateTime.now(),
+                        pageable);
+                break;
+            case PAST:
+                result = bookingStorage.findPastBookingsByOwnerId(userId, LocalDateTime.now(), pageable);
+                break;
+            case FUTURE:
+                result = bookingStorage.findFutureBookingsByOwnerId(userId, LocalDateTime.now(), pageable);
+                break;
+            case WAITING:
+                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.WAITING, pageable);
+                break;
+            case REJECTED:
+                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED, pageable);
+                break;
+        }
+        return result;
+    }
+
+    private Iterable<Booking> getAllSortedBookingsFromBooker(final GetBookingState state, Iterable<Booking> result,
+                                                             final Long bookerId, Pageable pageable) {
+        switch (state) {
+            case ALL:
+                result = bookingStorage.findAllByBookerId(bookerId, pageable);
+                break;
+            case CURRENT:
+                result = bookingStorage.findCurrentBookingsByBookerId(bookerId, LocalDateTime.now(), LocalDateTime.now(),
+                        pageable);
+                break;
+            case PAST:
+                result = bookingStorage.findPastBookingsByBookerId(bookerId, LocalDateTime.now(), pageable);
+                break;
+            case FUTURE:
+                result = bookingStorage.findFutureBookingsByBookerId(bookerId, LocalDateTime.now(), pageable);
+                break;
+            case WAITING:
+                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.WAITING, pageable);
+                break;
+            case REJECTED:
+                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.REJECTED, pageable);
+                break;
+        }
+        return result;
     }
 
     private User findUser(final Long userId) {
@@ -162,55 +223,5 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ItemUnavailableException("Вещь недоступна для бронирования.");
         }
-    }
-
-    private Iterable<Booking> getAllSortedBookingsFromUser(final GetBookingState state, Iterable<Booking> result,
-                                                           final Long userId) {
-        switch (state) {
-            case ALL:
-                result = bookingStorage.findAllByItemOwnerId(userId);
-                break;
-            case CURRENT:
-                result = bookingStorage.findCurrentBookingsByOwnerId(userId, LocalDateTime.now(), LocalDateTime.now());
-                break;
-            case PAST:
-                result = bookingStorage.findPastBookingsByOwnerId(userId, LocalDateTime.now());
-                break;
-            case FUTURE:
-                result = bookingStorage.findFutureBookingsByOwnerId(userId, LocalDateTime.now());
-                break;
-            case WAITING:
-                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.WAITING);
-                break;
-            case REJECTED:
-                result = bookingStorage.findBookingsByOwnerIdAndStatus(userId, BookingStatus.REJECTED);
-                break;
-        }
-        return result;
-    }
-
-    private Iterable<Booking> getAllSortedBookingsFromBooker(final GetBookingState state, Iterable<Booking> result,
-                                                             final Long bookerId) {
-        switch (state) {
-            case ALL:
-                result = bookingStorage.findAllByBookerId(bookerId);
-                break;
-            case CURRENT:
-                result = bookingStorage.findCurrentBookingsByBookerId(bookerId, LocalDateTime.now(), LocalDateTime.now());
-                break;
-            case PAST:
-                result = bookingStorage.findPastBookingsByBookerId(bookerId, LocalDateTime.now());
-                break;
-            case FUTURE:
-                result = bookingStorage.findFutureBookingsByBookerId(bookerId, LocalDateTime.now());
-                break;
-            case WAITING:
-                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.WAITING);
-                break;
-            case REJECTED:
-                result = bookingStorage.findBookingsByBookerIdAndStatus(bookerId, BookingStatus.REJECTED);
-                break;
-        }
-        return result;
     }
 }

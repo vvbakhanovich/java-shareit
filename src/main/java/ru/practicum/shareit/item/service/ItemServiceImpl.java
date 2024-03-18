@@ -8,13 +8,20 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingStorage;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.AddCommentDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.GetItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentStorage;
 import ru.practicum.shareit.item.storage.ItemStorage;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.ItemRequestStorage;
+import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -22,7 +29,12 @@ import ru.practicum.shareit.user.storage.UserStorage;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserStorage userStorage;
     private final BookingStorage bookingStorage;
     private final CommentStorage commentStorage;
+    private final ItemRequestStorage itemRequestStorage;
     private final ItemMapper itemMapper;
     private final BookingMapper bookingMapper;
     private final CommentMapper commentMapper;
@@ -50,6 +63,7 @@ public class ItemServiceImpl implements ItemService {
         final User owner = getUser(userId);
         final Item item = itemMapper.toModel(itemDto);
         item.setOwner(owner);
+        assignRequestToItem(itemDto, item);
         final Item addedItem = itemStorage.save(item);
         log.info("Пользователь с id '{}' добавил новую вещь c id '{}'.", userId, addedItem.getId());
         return itemMapper.toDto(addedItem);
@@ -95,6 +109,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public GetItemDto findItemById(final Long userId, final Long itemId) {
+        getUser(userId);
         final Item item = getItem(itemId);
         List<Booking> itemBookings = bookingStorage.findAllByItemId(itemId);
         GetItemDto itemWithBookingDatesDto;
@@ -110,15 +125,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Просмотр владельцем списка всех его вещей.
+     * Просмотр владельцем списка всех его вещей. Результат возвращается постранично. Для этого указываются два
+     * параметра:  from — индекс первого элемента, начиная с 0, и size — количество элементов для отображения.
      *
      * @param userId идентификатор пользователя, делающего запрос
+     * @param from   индекс первого отображаемого элемента, начиная с 0
+     * @param size   количество элементов для отображения
      * @return список вещей пользователя
      */
     @Override
-    public List<GetItemDto> findAllItemsByUserId(final Long userId) {
-        userStorage.findById(userId);
-        final List<Item> items = itemStorage.findAllByOwnerIdOrderById(userId);
+    public List<GetItemDto> findAllItemsByUserId(final Long userId, Long from, Integer size) {
+        getUser(userId);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        final List<Item> items = itemStorage.findAllByOwnerIdOrderById(userId, pageRequest);
         final List<Long> itemIds = items.stream()
                 .map(Item::getId).collect(Collectors.toList());
         final List<Booking> bookingFromIds = bookingStorage.findAllByItemIdIn(itemIds);
@@ -131,19 +150,24 @@ public class ItemServiceImpl implements ItemService {
 
     /**
      * Поиск вещи потенциальным арендатором. Пользователь передаёт в строке запроса текст, и система ищет вещи,
-     * содержащие этот текст в названии или описании. Регистр текста не учитывается.
+     * содержащие этот текст в названии или описании. Регистр текста не учитывается. Результат возвращается постранично.
+     * Для этого указываются два параметра:  from — индекс первого элемента, начиная с 0, и size — количество элементов
+     * для отображения.
      *
      * @param text текстовый запрос
+     * @param from индекс первого отображаемого элемента, начиная с 0
+     * @param size количество элементов для отображения
      * @return список вещей, соответсвующих запросу
      */
     @Override
-    public List<ItemDto> searchItems(final String text) {
+    public List<ItemDto> searchItems(final String text, Long from, Integer size) {
         log.info("Поиск вещей по запросу: {}.", text);
         if (text.isBlank()) {
             return Collections.emptyList();
         }
         String searchText = "%" + text.toLowerCase() + "%";
-        final Iterable<Item> searchResult = itemStorage.findAllByNameOrDescriptionContainingIgnoreCase(searchText);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        final Iterable<Item> searchResult = itemStorage.searchInTitleAndDescription(searchText, pageRequest);
         return itemMapper.toDtoList(Lists.newArrayList(searchResult));
     }
 
@@ -226,5 +250,15 @@ public class ItemServiceImpl implements ItemService {
     private Item getItem(final long itemId) {
         return itemStorage.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь с id '" + itemId + "' не найдена."));
+    }
+
+    private void assignRequestToItem(ItemDto itemDto, Item item) {
+        Long requestId = itemDto.getRequestId();
+        if (requestId != null && requestId > 0) {
+            ItemRequest itemRequest = itemRequestStorage.findById(requestId)
+                    .orElseThrow(() -> new NotFoundException("Запрос с id '" + requestId + "' не найден."));
+            itemRequest.addItem(item);
+            item.setRequest(itemRequest);
+        }
     }
 }
