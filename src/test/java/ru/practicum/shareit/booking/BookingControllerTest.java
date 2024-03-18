@@ -16,16 +16,28 @@ import ru.practicum.shareit.booking.dto.AddBookingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.GetBookingState;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.shared.exception.ItemUnavailableException;
+import ru.practicum.shareit.shared.exception.NotAuthorizedException;
+import ru.practicum.shareit.shared.exception.NotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = BookingController.class)
 class BookingControllerTest {
@@ -108,6 +120,38 @@ class BookingControllerTest {
 
     @Test
     @SneakyThrows
+    void addNewBooking_WhenNotFoundThrown_ShouldReturn404Status() {
+        when(bookingService.addBooking(userId, addBookingDto))
+                .thenThrow(NotFoundException.class);
+
+        mvc.perform(post("/bookings")
+                        .header(header, userId)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(addBookingDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotFoundException));
+
+        verify(bookingService, times(1)).addBooking(userId, addBookingDto);
+    }
+
+    @Test
+    @SneakyThrows
+    void addNewBooking_WhenNotAuthorizedThrown_ShouldReturn404() {
+        when(bookingService.addBooking(userId, addBookingDto))
+                .thenThrow(NotAuthorizedException.class);
+
+        mvc.perform(post("/bookings")
+                        .header(header, userId)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(addBookingDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotAuthorizedException));
+
+        verify(bookingService, times(1)).addBooking(userId, addBookingDto);
+    }
+
+    @Test
+    @SneakyThrows
     void acknowledgeBooking_WithAllParams_ShouldReturnStatus200() {
         Long bookingId = 2L;
         Boolean approved = true;
@@ -120,6 +164,40 @@ class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)));
+
+        verify(bookingService, times(1)).acknowledgeBooking(userId, bookingId, approved);
+    }
+
+    @Test
+    @SneakyThrows
+    void acknowledgeBooking_WhenItemUnavailableExceptionThrown_ShouldReturn404() {
+        Long bookingId = 2L;
+        Boolean approved = true;
+        when(bookingService.acknowledgeBooking(userId, bookingId, approved))
+                .thenThrow(ItemUnavailableException.class);
+
+        mvc.perform(patch("/bookings/{bookingId}", bookingId)
+                        .header(header, userId)
+                        .param("approved", approved.toString()))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ItemUnavailableException));
+
+        verify(bookingService, times(1)).acknowledgeBooking(userId, bookingId, approved);
+    }
+
+    @Test
+    @SneakyThrows
+    void acknowledgeBooking_WhenUnexpectedException_ShouldReturn500() {
+        Long bookingId = 2L;
+        Boolean approved = true;
+        when(bookingService.acknowledgeBooking(userId, bookingId, approved))
+                .thenThrow(RuntimeException.class);
+
+        mvc.perform(patch("/bookings/{bookingId}", bookingId)
+                        .header(header, userId)
+                        .param("approved", approved.toString()))
+                .andExpect(status().isInternalServerError())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof RuntimeException));
 
         verify(bookingService, times(1)).acknowledgeBooking(userId, bookingId, approved);
     }
