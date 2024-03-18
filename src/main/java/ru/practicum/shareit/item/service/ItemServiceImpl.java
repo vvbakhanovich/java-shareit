@@ -17,6 +17,7 @@ import ru.practicum.shareit.item.storage.CommentStorage;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestStorage;
+import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -118,12 +119,15 @@ public class ItemServiceImpl implements ItemService {
      * Просмотр владельцем списка всех его вещей.
      *
      * @param userId идентификатор пользователя, делающего запрос
+     * @param from
+     * @param size
      * @return список вещей пользователя
      */
     @Override
-    public List<GetItemDto> findAllItemsByUserId(final Long userId) {
+    public List<GetItemDto> findAllItemsByUserId(final Long userId, Long from, Integer size) {
         getUser(userId);
-        final List<Item> items = itemStorage.findAllByOwnerIdOrderById(userId);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
+        final List<Item> items = itemStorage.findAllByOwnerIdOrderById(userId, pageRequest);
         final List<Long> itemIds = items.stream()
                 .map(Item::getId).collect(Collectors.toList());
         final List<Booking> bookingFromIds = bookingStorage.findAllByItemIdIn(itemIds);

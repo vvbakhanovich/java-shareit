@@ -158,20 +158,6 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    public void getAvailableItemRequests_WithNullFromAndSize_ShouldInvokeFindAll() {
-        Long from = null;
-        Integer size = null;
-
-        when(userStorage.findById(userId))
-                .thenReturn(Optional.of(new User()));
-
-        itemRequestService.getAvailableItemRequests(userId, from, size);
-
-        verify(itemRequestStorage, times(1)).findAllRequests();
-        verify(itemRequestMapper, times(1)).toDtoList(any());
-    }
-
-    @Test
     public void getAvailableItemRequests_UserNotExists_ShouldThrowNotFoundException() {
         Long from = 1L;
         Integer size = 1;

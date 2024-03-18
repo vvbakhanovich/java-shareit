@@ -9,6 +9,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserStorage;
 
@@ -66,7 +67,8 @@ class ItemStorageTest {
 
     @Test
     void findAllByOwnerIdOrderById_ShouldReturnListOfTwoItems() {
-        List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId());
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
+        List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId(), pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));
@@ -74,8 +76,29 @@ class ItemStorageTest {
     }
 
     @Test
+    void findAllByOwnerIdOrderById_When_OffsetIs1_ShouldReturnListOfTOneItems() {
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(1L, 5);
+        List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId(), pageRequest);
+
+        assertThat(items, notNullValue());
+        assertThat(items.size(), is(1));
+        assertThat(items, is(List.of(savedItem2)));
+    }
+
+    @Test
+    void findAllByOwnerIdOrderById_When_SizeIs1_ShouldReturnListOfTOneItems() {
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 1);
+        List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId(), pageRequest);
+
+        assertThat(items, notNullValue());
+        assertThat(items.size(), is(1));
+        assertThat(items, is(List.of(savedItem1)));
+    }
+
+    @Test
     void findAllByOwnerIdOrderById_WhenUnknownUser_ShouldReturnEmptyList() {
-        List<Item> items = itemStorage.findAllByOwnerIdOrderById(999L);
+        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
+        List<Item> items = itemStorage.findAllByOwnerIdOrderById(999L, pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(0));

@@ -11,7 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.booking.dto.AddBookingDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.AddCommentDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.GetItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -22,7 +26,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -247,11 +256,13 @@ class ItemServiceImplIntegrationTest {
 
     @Test
     void findAllItemsByUserId_ShouldReturnOwnersItemListWithBookings() {
+        long from = 0;
+        int size = 4;
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
         long itemId = savedItem.getId();
         setUpBookings(itemId);
 
-        List<GetItemDto> items = itemService.findAllItemsByUserId(savedUser1.getId());
+        List<GetItemDto> items = itemService.findAllItemsByUserId(savedUser1.getId(), from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -264,9 +275,25 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
-    void findAllItemsByUserId_WhenUserNotHaveItems_ShouldReturnEmptyList() {
+    void findAllItemsByUserId_WhenFromIs1_ShouldReturnEmptyList() {
+        long from = 1;
+        int size = 4;
+        ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
+        long itemId = savedItem.getId();
+        setUpBookings(itemId);
 
-        List<GetItemDto> items = itemService.findAllItemsByUserId(savedUser1.getId());
+        List<GetItemDto> items = itemService.findAllItemsByUserId(savedUser1.getId(), from, size);
+
+        assertThat(items, notNullValue());
+        assertThat(items.size(), is(0));
+    }
+
+    @Test
+    void findAllItemsByUserId_WhenUserNotHaveItems_ShouldReturnEmptyList() {
+        long from = 0;
+        int size = 4;
+
+        List<GetItemDto> items = itemService.findAllItemsByUserId(savedUser1.getId(), from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(0));

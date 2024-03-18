@@ -146,26 +146,6 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
-    @SneakyThrows
-    void getAvailableItemRequests_FromNullSizeNull_ShouldReturnAllRequests() {
-        User user2 = User.builder().name("username2").email("test2@email.com").build();
-        AddItemRequestDto addItemRequestDto2 = new AddItemRequestDto("description 2");
-        AddItemRequestDto addItemRequestDto3 = new AddItemRequestDto("description 3");
-        User savedUser2 = userStorage.save(user2);
-        ItemRequestDto savedRequest1 = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
-        Thread.sleep(100L);
-        ItemRequestDto savedRequest2 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto2);
-        Thread.sleep(100L);
-        ItemRequestDto savedRequest3 = itemRequestService.addNewItemRequest(savedUser2.getId(), addItemRequestDto3);
-
-        List<ItemRequestDto> availableItemRequests = itemRequestService
-                .getAvailableItemRequests(savedUser.getId(), null, null);
-
-        assertThat(availableItemRequests, notNullValue());
-        assertThat(availableItemRequests, is(List.of(savedRequest3, savedRequest2, savedRequest1)));
-    }
-
-    @Test
     void getItemRequestById_ShouldReturnItem() {
         ItemRequestDto savedRequest = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
 

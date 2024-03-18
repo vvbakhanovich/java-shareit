@@ -184,9 +184,11 @@ class ItemControllerTest {
 
     @Test
     @SneakyThrows
-    void getAllItemsByUserId_ShouldReturnStatus200() {
+    void getAllItemsByUserId_WithoutParams_ShouldReturnStatus200() {
+        long from = 0L;
+        int size = 10;
         GetItemDto getItemDto = new GetItemDto();
-        when(itemService.findAllItemsByUserId(userId))
+        when(itemService.findAllItemsByUserId(userId, from, size))
                 .thenReturn(List.of(getItemDto));
 
         mvc.perform(get("/items")
@@ -197,21 +199,45 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.[0].name", is(getItemDto.getName())))
                 .andExpect(jsonPath("$.[0].available", is(getItemDto.getAvailable())));
 
-        verify(itemService, times(1)).findAllItemsByUserId(userId);
+        verify(itemService, times(1)).findAllItemsByUserId(userId, from, size);
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllItemsByUserId_WithParams_ShouldReturnStatus200() {
+        long from = 1;
+        int size = 5;
+        GetItemDto getItemDto = new GetItemDto();
+        when(itemService.findAllItemsByUserId(userId, from, size))
+                .thenReturn(List.of(getItemDto));
+
+        mvc.perform(get("/items")
+                        .header(header, userId)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(getItemDto))))
+                .andExpect(jsonPath("$.[0].name", is(getItemDto.getName())))
+                .andExpect(jsonPath("$.[0].available", is(getItemDto.getAvailable())));
+
+        verify(itemService, times(1)).findAllItemsByUserId(userId, from, size);
     }
 
     @Test
     @SneakyThrows
     void getAllItemsByUserId_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
+        long from = 1;
+        int size = 4;
         GetItemDto getItemDto = new GetItemDto();
-        when(itemService.findAllItemsByUserId(userId))
+        when(itemService.findAllItemsByUserId(userId, from, size))
                 .thenReturn(List.of(getItemDto));
 
         mvc.perform(get("/items"))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
-        verify(itemService, never()).findAllItemsByUserId(any());
+        verify(itemService, never()).findAllItemsByUserId(any(), eq(from), eq(size));
     }
 
     @Test

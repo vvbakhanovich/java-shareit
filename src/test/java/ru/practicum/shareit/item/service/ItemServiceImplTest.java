@@ -13,7 +13,11 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingStorage;
-import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.dto.AddCommentDto;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.GetItemDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
@@ -22,6 +26,7 @@ import ru.practicum.shareit.item.storage.CommentStorage;
 import ru.practicum.shareit.item.storage.ItemStorage;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestStorage;
+import ru.practicum.shareit.shared.OffsetPageRequest;
 import ru.practicum.shareit.shared.exception.ItemUnavailableException;
 import ru.practicum.shareit.shared.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -33,10 +38,18 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ItemServiceImplTest {
@@ -79,6 +92,9 @@ class ItemServiceImplTest {
 
     @Captor
     private ArgumentCaptor<Comment> commentArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<OffsetPageRequest> offsetPageRequestArgumentCaptor;
 
     private User owner;
 
@@ -517,12 +533,14 @@ class ItemServiceImplTest {
 
     @Test
     void findAllItemsByUserId_ShouldReturnItemsWithBookingAndComments() {
+        long from = 0;
+        int size = 4;
         booking1.setStatus(BookingStatus.APPROVED);
         booking2.setStatus(BookingStatus.APPROVED);
         booking3.setStatus(BookingStatus.APPROVED);
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.of(requester));
-        when(itemStorage.findAllByOwnerIdOrderById(requesterId))
+        when(itemStorage.findAllByOwnerIdOrderById(eq(requesterId), any()))
                 .thenReturn(List.of(item));
         when(bookingStorage.findAllByItemIdIn(List.of(itemId)))
                 .thenReturn(List.of(booking1, booking2, booking3));
@@ -546,7 +564,7 @@ class ItemServiceImplTest {
         when(itemMapper.toGetItemDto(eq(item), any(), any()))
                 .thenReturn(new GetItemDto());
 
-        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId);
+        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId, from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -557,7 +575,11 @@ class ItemServiceImplTest {
         assertThat(bookings.get(0), is(booking1));
         assertThat(bookings.get(1), is(booking3));
         verify(userStorage, times(1)).findById(requesterId);
-        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(requesterId);
+        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(eq(requesterId),
+                offsetPageRequestArgumentCaptor.capture());
+        OffsetPageRequest captorValue = offsetPageRequestArgumentCaptor.getValue();
+        assertThat(captorValue.getOffset(), is(from));
+        assertThat(captorValue.getPageSize(), is(size));
         verify(bookingStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentMapper, times(1)).toDtoList(List.of(comment));
@@ -565,11 +587,13 @@ class ItemServiceImplTest {
 
     @Test
     void findAllItemsByUserId_WhenNextBookingsIsNotApproved_ShouldReturnItemsWithBookingAndComments() {
+        long from = 0;
+        int size = 4;
         booking1.setStatus(BookingStatus.APPROVED);
         booking2.setStatus(BookingStatus.APPROVED);
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.of(requester));
-        when(itemStorage.findAllByOwnerIdOrderById(requesterId))
+        when(itemStorage.findAllByOwnerIdOrderById(eq(requesterId), any()))
                 .thenReturn(List.of(item));
         when(bookingStorage.findAllByItemIdIn(List.of(itemId)))
                 .thenReturn(List.of(booking1, booking2, booking3));
@@ -593,7 +617,7 @@ class ItemServiceImplTest {
         when(itemMapper.toGetItemDto(eq(item), any(), any()))
                 .thenReturn(new GetItemDto());
 
-        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId);
+        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId, from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -604,7 +628,11 @@ class ItemServiceImplTest {
         assertThat(bookings.get(0), is(booking1));
         assertThat(bookings.get(1), nullValue());
         verify(userStorage, times(1)).findById(requesterId);
-        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(requesterId);
+        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(eq(requesterId),
+                offsetPageRequestArgumentCaptor.capture());
+        OffsetPageRequest captorValue = offsetPageRequestArgumentCaptor.getValue();
+        assertThat(captorValue.getOffset(), is(from));
+        assertThat(captorValue.getPageSize(), is(size));
         verify(bookingStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentMapper, times(1)).toDtoList(List.of(comment));
@@ -612,9 +640,11 @@ class ItemServiceImplTest {
 
     @Test
     void findAllItemsByUserId_WhenBookingsAreNotApproved_ShouldReturnItemsWithNoBookingAndComments() {
+        long from = 1;
+        int size = 4;
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.of(requester));
-        when(itemStorage.findAllByOwnerIdOrderById(requesterId))
+        when(itemStorage.findAllByOwnerIdOrderById(eq(requesterId), any()))
                 .thenReturn(List.of(item));
         when(bookingStorage.findAllByItemIdIn(List.of(itemId)))
                 .thenReturn(List.of(booking1, booking2, booking3));
@@ -638,7 +668,7 @@ class ItemServiceImplTest {
         when(itemMapper.toGetItemDto(eq(item), any(), any()))
                 .thenReturn(new GetItemDto());
 
-        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId);
+        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId, from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
@@ -649,7 +679,11 @@ class ItemServiceImplTest {
         assertThat(bookings.get(0), nullValue());
         assertThat(bookings.get(1), nullValue());
         verify(userStorage, times(1)).findById(requesterId);
-        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(requesterId);
+        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(eq(requesterId),
+                offsetPageRequestArgumentCaptor.capture());
+        OffsetPageRequest captorValue = offsetPageRequestArgumentCaptor.getValue();
+        assertThat(captorValue.getOffset(), is(from));
+        assertThat(captorValue.getPageSize(), is(size));
         verify(bookingStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentMapper, times(1)).toDtoList(List.of(comment));
@@ -657,9 +691,11 @@ class ItemServiceImplTest {
 
     @Test
     void findAllItemsByUserId_WhenNoBookings_ShouldReturnItemsWithoutBookingAndComments() {
+        long from = 1;
+        int size = 4;
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.of(requester));
-        when(itemStorage.findAllByOwnerIdOrderById(requesterId))
+        when(itemStorage.findAllByOwnerIdOrderById(eq(requesterId), any()))
                 .thenReturn(List.of(item));
         when(bookingStorage.findAllByItemIdIn(List.of(itemId)))
                 .thenReturn(Collections.emptyList());
@@ -669,13 +705,17 @@ class ItemServiceImplTest {
         when(itemMapper.toWithBookingsDtoList(List.of(item)))
                 .thenReturn(List.of(getItemDto));
 
-        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId);
+        List<GetItemDto> items = itemService.findAllItemsByUserId(requesterId, from, size);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
         assertThat(items.get(0).getComments(), empty());
         verify(userStorage, times(1)).findById(requesterId);
-        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(requesterId);
+        verify(itemStorage, times(1)).findAllByOwnerIdOrderById(eq(requesterId),
+                offsetPageRequestArgumentCaptor.capture());
+        OffsetPageRequest captorValue = offsetPageRequestArgumentCaptor.getValue();
+        assertThat(captorValue.getOffset(), is(from));
+        assertThat(captorValue.getPageSize(), is(size));
         verify(bookingStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(commentStorage, times(1)).findAllByItemIdIn(List.of(itemId));
         verify(itemMapper, times(1)).toWithBookingsDtoList(List.of(item));
@@ -683,14 +723,16 @@ class ItemServiceImplTest {
 
     @Test
     void findAllItemsByUserId_WhenUserNotFound_ShouldThrowNotFoundException() {
+        long from = 1;
+        int size = 4;
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.empty());
 
         NotFoundException e = assertThrows(NotFoundException.class,
-                () -> itemService.findAllItemsByUserId(requesterId));
+                () -> itemService.findAllItemsByUserId(requesterId, from, size));
         assertThat(e.getMessage(), is("Пользователь с id '" + requesterId + "' не найден."));
         verify(userStorage, times(1)).findById(requesterId);
-        verify(itemStorage, never()).findAllByOwnerIdOrderById(any());
+        verify(itemStorage, never()).findAllByOwnerIdOrderById(any(), any());
         verify(bookingStorage, never()).findAllByItemIdIn(any());
         verify(commentStorage, never()).findAllByItemIdIn(any());
         verify(itemMapper, never()).toWithBookingsDtoList(any());

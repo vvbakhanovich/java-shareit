@@ -166,7 +166,7 @@ class ItemRequestControllerTest {
         mvc.perform(get("/requests/all")
                         .header(header, userId)
                         .param("from", "1")
-                        .param("size", "-1"))
+                        .param("size", "-14"))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
 
@@ -189,7 +189,7 @@ class ItemRequestControllerTest {
     @Test
     @SneakyThrows
     public void getAvailableItemRequests_NullFromAndSize_ShouldReturnRequests() {
-        when(itemRequestService.getAvailableItemRequests(userId, null, null))
+        when(itemRequestService.getAvailableItemRequests(userId, 0L, 10))
                 .thenReturn(List.of(itemRequestDto));
 
         mvc.perform(get("/requests/all")
@@ -198,7 +198,7 @@ class ItemRequestControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(itemRequestDto))));
 
-        verify(itemRequestService, times(1)).getAvailableItemRequests(userId, null, null);
+        verify(itemRequestService, times(1)).getAvailableItemRequests(userId, 0L, 10);
     }
 
     @Test
