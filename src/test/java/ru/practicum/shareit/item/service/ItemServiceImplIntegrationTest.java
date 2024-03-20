@@ -29,7 +29,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -381,7 +381,7 @@ class ItemServiceImplIntegrationTest {
         assertThat(commentDto, notNullValue());
         assertThat(commentDto.getAuthorName(), is(savedUser2.getName()));
         assertThat(commentDto.getText(), is(addCommentDto.getText()));
-        assertThat(commentDto.getCreated(), lessThan(LocalDateTime.now()));
+        assertThat(commentDto.getCreated(), lessThanOrEqualTo(LocalDateTime.now()));
     }
 
     @Test

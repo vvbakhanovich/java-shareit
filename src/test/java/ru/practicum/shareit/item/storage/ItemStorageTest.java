@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.storage;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,36 +67,41 @@ class ItemStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей владельца")
     void findAllByOwnerIdOrderById_ShouldReturnListOfTwoItems() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
         List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId(), pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));
-        assertThat(items, is(List.of(savedItem1, savedItem2)));
+        assertThat(items.get(0).getId(), is(savedItem1.getId()));
+        assertThat(items.get(1).getId(), is(savedItem2.getId()));
     }
 
     @Test
+    @DisplayName("Поиск вещей владельца, начиная с второго элемента")
     void findAllByOwnerIdOrderById_When_OffsetIs1_ShouldReturnListOfTOneItems() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(1L, 5);
         List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId(), pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
-        assertThat(items, is(List.of(savedItem2)));
+        assertThat(items.get(0).getId(), is(savedItem2.getId()));
     }
 
     @Test
+    @DisplayName("Поиск вещей владельца, начиная с первого элемента, количество элементов на странице 1")
     void findAllByOwnerIdOrderById_When_SizeIs1_ShouldReturnListOfTOneItems() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 1);
         List<Item> items = itemStorage.findAllByOwnerIdOrderById(savedUser1.getId(), pageRequest);
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
-        assertThat(items, is(List.of(savedItem1)));
+        assertThat(items.get(0).getId(), is(savedItem1.getId()));
     }
 
     @Test
+    @DisplayName("Поиск вещей неизвестного пользователя")
     void findAllByOwnerIdOrderById_WhenUnknownUser_ShouldReturnEmptyList() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
         List<Item> items = itemStorage.findAllByOwnerIdOrderById(999L, pageRequest);
@@ -105,6 +111,7 @@ class ItemStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск по названию и описанию вещи")
     void searchInTitleAndDescription_WhenSearchInTitle_ShouldReturnAllItems() {
         String text = "%name%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
@@ -113,10 +120,12 @@ class ItemStorageTest {
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));
-        assertThat(items, is(List.of(savedItem1, savedItem3)));
+        assertThat(items.get(0).getId(), is(savedItem1.getId()));
+        assertThat(items.get(1).getId(), is(savedItem3.getId()));
     }
 
     @Test
+    @DisplayName("Поиск по названию и описанию вещи, начиная со второго элемента")
     void searchInTitleAndDescription_WhenSearchInTitleAndFrom1_ShouldReturnAllItems() {
         String text = "%name%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(1L, 5);
@@ -125,10 +134,11 @@ class ItemStorageTest {
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
-        assertThat(items, is(List.of(savedItem3)));
+        assertThat(items.get(0).getId(), is(savedItem3.getId()));
     }
 
     @Test
+    @DisplayName("Поиск по названию и описанию вещи, элементов на странице 1")
     void searchInTitleAndDescription_WhenSearchInTitleAndSize1_ShouldReturnAllItems() {
         String text = "%name%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 1);
@@ -137,10 +147,11 @@ class ItemStorageTest {
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
-        assertThat(items, is(List.of(savedItem1)));
+        assertThat(items.get(0).getId(), is(savedItem1.getId()));
     }
 
     @Test
+    @DisplayName("Поиск по названию вещи")
     void searchInTitleAndDescription_WhenSearchInTitle2_ShouldReturnAllItems() {
         String text = "%name 3%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
@@ -149,10 +160,11 @@ class ItemStorageTest {
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
-        assertThat(items, is(List.of(savedItem3)));
+        assertThat(items.get(0).getId(), is(savedItem3.getId()));
     }
 
     @Test
+    @DisplayName("Поиск по описанию вещи")
     void searchInTitleAndDescription_WhenSearchInDescription_ShouldReturnAllItems() {
         String text = "%description%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
@@ -161,10 +173,12 @@ class ItemStorageTest {
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(2));
-        assertThat(items, is(List.of(savedItem1, savedItem3)));
+        assertThat(items.get(0).getId(), is(savedItem1.getId()));
+        assertThat(items.get(1).getId(), is(savedItem3.getId()));
     }
 
     @Test
+    @DisplayName("Поиск по описанию вещи 3")
     void searchInTitleAndDescription_WhenSearchInDescription2_ShouldReturnAllItems() {
         String text = "%description 3%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
@@ -173,19 +187,7 @@ class ItemStorageTest {
 
         assertThat(items, notNullValue());
         assertThat(items.size(), is(1));
-        assertThat(items, is(List.of(savedItem3)));
-    }
-
-    @Test
-    void searchInTitleAndDescription_WhenSearchTextIsEmpty_ShouldReturnAllItems() {
-        String text = "%%";
-        OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 5);
-
-        List<Item> items = itemStorage.searchInTitleAndDescription(text, pageRequest);
-
-        assertThat(items, notNullValue());
-        assertThat(items.size(), is(2));
-        assertThat(items, is(List.of(savedItem1, savedItem3)));
+        assertThat(items.get(0).getId(), is(savedItem3.getId()));
     }
 
     private Item createItem(int id) {

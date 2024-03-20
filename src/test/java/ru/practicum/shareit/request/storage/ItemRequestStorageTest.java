@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.storage;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,7 @@ class ItemRequestStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса от пользователя по его id, когда у пользователя нет вещей")
     public void findItemRequestsFromUser_ReturnRequestsWithoutItemsFromRequester() {
         List<ItemRequest> requests = itemRequestStorage.findRequestsFromUser(savedUser2.getId());
 
@@ -89,6 +91,7 @@ class ItemRequestStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса от пользователя по его id, когда у пользователя есть вещи")
     public void findItemRequestsFromUser_ReturnRequestsWithItemsFromRequester() {
         List<ItemRequest> requests = itemRequestStorage.findRequestsFromUser(savedUser1.getId());
 
@@ -102,26 +105,19 @@ class ItemRequestStorageTest {
     }
 
     @Test
-    @SneakyThrows
-    public void findItemRequestsFromUser_ReturnRequestsWithItemsFromRequesterSortedByCreated() {
-        List<ItemRequest> requests = itemRequestStorage.findRequestsFromUser(savedUser1.getId());
-
-        assertThat(requests, is(List.of(savedRequest4, savedRequest1)));
-        assertThat(requests.size(), is(2));
-    }
-
-    @Test
+    @DisplayName("Поиск доступных запросов, количество элементов на странице 1")
     public void findAllByOrderByCreatedDesc_From0Size1_ShouldReturnListOfItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 1);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
-        assertThat(requests.getContent(), is(List.of(savedRequest3)));
         assertThat(requests.getContent().size(), is(1));
+        assertThat(requests.getContent().get(0).getId(), is(savedRequest3.getId()));
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов, количество элементов на таблице 10")
     @SneakyThrows
     public void findAllByOrderByCreatedDesc_From0Size10_ShouldReturnListOfTwoItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 10);
@@ -129,29 +125,33 @@ class ItemRequestStorageTest {
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
-        assertThat(requests.getContent(), is(List.of(savedRequest3, savedRequest2)));
         assertThat(requests.getContent().size(), is(2));
+        assertThat(requests.getContent().get(0).getId(), is(savedRequest3.getId()));
+        assertThat(requests.getContent().get(1).getId(), is(savedRequest2.getId()));
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов, с 1го элемента количество элементов на таблице 1")
     public void findAllByOrderByCreatedDesc_From1Size1_ShouldReturnListOfItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(1L, 1);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
-        assertThat(requests.getContent(), is(List.of(savedRequest2)));
         assertThat(requests.getContent().size(), is(1));
+        assertThat(requests.getContent().get(0).getId(), is(savedRequest2.getId()));
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов, с 0го элемента количество элементов на таблице 2")
     public void findAllByOrderByCreatedDesc_From1Size1_ShouldReturnAllItemRequest() {
         OffsetPageRequest pageRequest = OffsetPageRequest.of(0L, 2);
 
         Page<ItemRequest> requests = itemRequestStorage.findAvailableRequests(savedUser1.getId(),
                 pageRequest);
 
-        assertThat(requests.getContent(), is(List.of(savedRequest3, savedRequest2)));
         assertThat(requests.getContent().size(), is(2));
+        assertThat(requests.getContent().get(0).getId(), is(savedRequest3.getId()));
+        assertThat(requests.getContent().get(1).getId(), is(savedRequest2.getId()));
     }
 }

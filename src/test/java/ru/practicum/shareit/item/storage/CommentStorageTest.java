@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.storage;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,15 +93,20 @@ class CommentStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск комментариев по id вещи")
     void findAllByItemId_ShouldReturnAllCommentsOnItem2() {
         List<Comment> comments = commentStorage.findAllByItemId(savedItem2.getId());
 
         assertThat(comments, notNullValue());
         assertThat(comments.size(), is(2));
-        assertThat(comments, is(List.of(savedComment2, savedComment3)));
+        assertThat(comments.get(0).getId(), is(savedComment2.getId()));
+        assertThat(comments.get(0).getText(), is(savedComment2.getText()));
+        assertThat(comments.get(1).getId(), is(savedComment3.getId()));
+        assertThat(comments.get(1).getText(), is(savedComment3.getText()));
     }
 
     @Test
+    @DisplayName("Поиск комментариев по id вещи, когда нет оставленных комментариев")
     void findAllByItemId_WhenItemWithoutComments_ShouldReturnEmptyList() {
         List<Comment> comments = commentStorage.findAllByItemId(savedItem3.getId());
 
@@ -109,6 +115,7 @@ class CommentStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск комментариев по id несуществующей вещи")
     void findAllByItemId_WhenUnknownItem_ShouldReturnEmptyList() {
         List<Comment> comments = commentStorage.findAllByItemId(999L);
 
@@ -117,24 +124,35 @@ class CommentStorageTest {
     }
 
     @Test
+    @DisplayName("Поиск комментариев по списку id вещей")
     void findAllByItemIdIn_ShouldReturnAllCommentsFromItem1AndItem2() {
         List<Comment> comments = commentStorage.findAllByItemIdIn(List.of(savedItem1.getId(), savedItem2.getId()));
 
         assertThat(comments, notNullValue());
         assertThat(comments.size(), is(3));
-        assertThat(comments, is(List.of(savedComment1, savedComment2, savedComment3)));
+        assertThat(comments.get(0).getId(), is(savedComment1.getId()));
+        assertThat(comments.get(0).getText(), is(savedComment1.getText()));
+        assertThat(comments.get(1).getId(), is(savedComment2.getId()));
+        assertThat(comments.get(1).getText(), is(savedComment2.getText()));
+        assertThat(comments.get(2).getId(), is(savedComment3.getId()));
+        assertThat(comments.get(2).getText(), is(savedComment3.getText()));
     }
 
     @Test
+    @DisplayName("Поиск комментариев по списку из id только savedItem2")
     void findAllByItemIdIn_OnlyFromItem2_ShouldReturnAllCommentsFromItem2() {
         List<Comment> comments = commentStorage.findAllByItemIdIn(List.of(savedItem2.getId()));
 
         assertThat(comments, notNullValue());
         assertThat(comments.size(), is(2));
-        assertThat(comments, is(List.of(savedComment2, savedComment3)));
+        assertThat(comments.get(0).getId(), is(savedComment2.getId()));
+        assertThat(comments.get(0).getText(), is(savedComment2.getText()));
+        assertThat(comments.get(1).getId(), is(savedComment3.getId()));
+        assertThat(comments.get(1).getText(), is(savedComment3.getText()));
     }
 
     @Test
+    @DisplayName("Поиск комментариев по списку из id только savedItem3")
     void findAllByItemIdIn_OnlyFromItem3_ShouldReturnEmptyList() {
         List<Comment> comments = commentStorage.findAllByItemIdIn(List.of(savedItem3.getId()));
 
