@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -56,6 +57,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи")
     @SneakyThrows
     void addItem_ShouldReturnStatus201() {
         when(itemService.addItem(userId, itemDto))
@@ -68,13 +70,17 @@ class ItemControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(itemDto)))
+                .andExpect(jsonPath("$.id", is(itemDto.getId())))
                 .andExpect(jsonPath("$.name", is(itemDto.getName())))
+                .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
+                .andExpect(jsonPath("$.requestId", is(itemDto.getRequestId())))
                 .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
 
         verify(itemService, times(1)).addItem(userId, itemDto);
     }
 
     @Test
+    @DisplayName("Добавление вещи, запрос без заголовка")
     @SneakyThrows
     void addItem_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
         when(itemService.addItem(userId, itemDto))
@@ -90,6 +96,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи с невалидными полями")
     @SneakyThrows
     void addItem_ItemDtoNotValid_ShouldThrowMethodArgumentNotValidExceptionAndStatus400() {
         itemDto.setAvailable(null);
@@ -107,6 +114,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи")
     @SneakyThrows
     void updateItem_ShouldReturnStatus200() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
@@ -124,13 +132,17 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(itemDto)))
+                .andExpect(jsonPath("$.id", is(itemDto.getId())))
                 .andExpect(jsonPath("$.name", is(itemDto.getName())))
+                .andExpect(jsonPath("$.description", is(itemDto.getDescription())))
+                .andExpect(jsonPath("$.requestId", is(itemDto.getRequestId())))
                 .andExpect(jsonPath("$.available", is(itemDto.getAvailable())));
 
         verify(itemService, times(1)).updateItem(userId, itemId, itemUpdateDto);
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи, запрос без заголовка")
     @SneakyThrows
     void updateItem_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
@@ -151,6 +163,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Получение вещи по id")
     @SneakyThrows
     void getItemById_ShouldReturnStatus200() {
         GetItemDto getItemDto = new GetItemDto();
@@ -162,13 +175,19 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(getItemDto)))
+                .andExpect(jsonPath("$.id", is(getItemDto.getId())))
                 .andExpect(jsonPath("$.name", is(getItemDto.getName())))
-                .andExpect(jsonPath("$.available", is(getItemDto.getAvailable())));
+                .andExpect(jsonPath("$.description", is(getItemDto.getDescription())))
+                .andExpect(jsonPath("$.available", is(getItemDto.getAvailable())))
+                .andExpect(jsonPath("$.lastBooking", is(getItemDto.getLastBooking())))
+                .andExpect(jsonPath("$.nextBooking", is(getItemDto.getNextBooking())))
+                .andExpect(jsonPath("$.comments", is(getItemDto.getComments())));
 
         verify(itemService, times(1)).findItemById(userId, itemId);
     }
 
     @Test
+    @DisplayName("Получение вещи по id, запрос без заголовка")
     @SneakyThrows
     void getItemById_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
         GetItemDto getItemDto = new GetItemDto();
@@ -183,6 +202,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Получение вещей пользователя с параметрами по умолчанию")
     @SneakyThrows
     void getAllItemsByUserId_WithoutParams_ShouldReturnStatus200() {
         long from = 0L;
@@ -196,13 +216,19 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(getItemDto))))
+                .andExpect(jsonPath("$.[0].id", is(getItemDto.getId())))
                 .andExpect(jsonPath("$.[0].name", is(getItemDto.getName())))
-                .andExpect(jsonPath("$.[0].available", is(getItemDto.getAvailable())));
+                .andExpect(jsonPath("$.[0].description", is(getItemDto.getDescription())))
+                .andExpect(jsonPath("$.[0].available", is(getItemDto.getAvailable())))
+                .andExpect(jsonPath("$.[0].lastBooking", is(getItemDto.getLastBooking())))
+                .andExpect(jsonPath("$.[0].nextBooking", is(getItemDto.getNextBooking())))
+                .andExpect(jsonPath("$.[0].comments", is(getItemDto.getComments())));
 
         verify(itemService, times(1)).findAllItemsByUserId(userId, from, size);
     }
 
     @Test
+    @DisplayName("Получение вещей пользователя")
     @SneakyThrows
     void getAllItemsByUserId_WithParams_ShouldReturnStatus200() {
         long from = 1;
@@ -218,13 +244,19 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(getItemDto))))
+                .andExpect(jsonPath("$.[0].id", is(getItemDto.getId())))
                 .andExpect(jsonPath("$.[0].name", is(getItemDto.getName())))
-                .andExpect(jsonPath("$.[0].available", is(getItemDto.getAvailable())));
+                .andExpect(jsonPath("$.[0].description", is(getItemDto.getDescription())))
+                .andExpect(jsonPath("$.[0].available", is(getItemDto.getAvailable())))
+                .andExpect(jsonPath("$.[0].lastBooking", is(getItemDto.getLastBooking())))
+                .andExpect(jsonPath("$.[0].nextBooking", is(getItemDto.getNextBooking())))
+                .andExpect(jsonPath("$.[0].comments", is(getItemDto.getComments())));
 
         verify(itemService, times(1)).findAllItemsByUserId(userId, from, size);
     }
 
     @Test
+    @DisplayName("Получение вещей пользователя")
     @SneakyThrows
     void getAllItemsByUserId_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
         long from = 1;
@@ -241,6 +273,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, запрос без параметров")
     @SneakyThrows
     void searchItems_WithoutParams_ShouldReturnStatus200() {
         String text = "search";
@@ -255,13 +288,17 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(itemDto))))
+                .andExpect(jsonPath("$.[0].id", is(itemDto.getId())))
                 .andExpect(jsonPath("$.[0].name", is(itemDto.getName())))
+                .andExpect(jsonPath("$.[0].description", is(itemDto.getDescription())))
+                .andExpect(jsonPath("$.[0].requestId", is(itemDto.getRequestId())))
                 .andExpect(jsonPath("$.[0].available", is(itemDto.getAvailable())));
 
         verify(itemService, times(1)).searchItems(text, from, size);
     }
 
     @Test
+    @DisplayName("Поиск вещей")
     @SneakyThrows
     void searchItems_WithParams_ShouldReturnStatus200() {
         String text = "search";
@@ -278,13 +315,17 @@ class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(itemDto))))
+                .andExpect(jsonPath("$.[0].id", is(itemDto.getId())))
                 .andExpect(jsonPath("$.[0].name", is(itemDto.getName())))
+                .andExpect(jsonPath("$.[0].description", is(itemDto.getDescription())))
+                .andExpect(jsonPath("$.[0].requestId", is(itemDto.getRequestId())))
                 .andExpect(jsonPath("$.[0].available", is(itemDto.getAvailable())));
 
         verify(itemService, times(1)).searchItems(text, from, size);
     }
 
     @Test
+    @DisplayName("Поиск вещей, запрос без заголовка")
     @SneakyThrows
     void searchItems_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndStatus400() {
         long from = 0;
@@ -302,6 +343,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, пустой запрос")
     @SneakyThrows
     void searchItems_WithoutText_ShouldThrowMissingServletRequestParameterExceptionExceptionAndStatus400() {
         long from = 0;
@@ -320,6 +362,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление комментария")
     @SneakyThrows
     void addCommentToItem_ShouldReturnStatus201() {
         AddCommentDto addCommentDto = new AddCommentDto("comment");
@@ -341,6 +384,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление комментария, запрос без заголовка")
     @SneakyThrows
     void addCommentToItem_WithoutHeader_ShouldThrowMissingRequestHeaderExceptionAndReturnStatus400() {
         AddCommentDto addCommentDto = new AddCommentDto("comment");
@@ -358,6 +402,7 @@ class ItemControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление комментария, пустой комментарий")
     @SneakyThrows
     void addCommentToItem_AddCommentDtoNotValid_ShouldThrowMethodArgumentNotValidExceptionAndReturnStatus400() {
         AddCommentDto addCommentDto = new AddCommentDto(null);
