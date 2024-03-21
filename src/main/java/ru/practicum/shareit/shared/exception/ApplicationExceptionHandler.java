@@ -32,7 +32,7 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemUnavailableException(ItemUnavailableException e) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.getErrors().put("Error message", e.getLocalizedMessage());
+        errorResponse.getErrors().put("errorMessage", e.getLocalizedMessage());
         log.error(e.getLocalizedMessage());
         return errorResponse;
     }
@@ -41,7 +41,7 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotAuthorizedException(NotAuthorizedException e) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.getErrors().put("ErrorMessage", e.getLocalizedMessage());
+        errorResponse.getErrors().put("errorMessage", e.getLocalizedMessage());
         log.error(e.getLocalizedMessage());
         return errorResponse;
     }
@@ -75,7 +75,7 @@ public class ApplicationExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleItemUnavailableException(ConstraintViolationException e) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.getErrors().put("Error message", e.getLocalizedMessage());
+        errorResponse.getErrors().put("errorMessage", e.getLocalizedMessage());
         log.error(e.getLocalizedMessage());
         return errorResponse;
     }
