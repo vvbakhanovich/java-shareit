@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 public class GetItemDto {
 
-    private long id;
+    private Long id;
 
     private String name;
 
