@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +85,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи")
     void addItem_ShouldReturnItemWithNotNullId() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -95,6 +97,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи, пользователь не найден")
     void addItem_UserNotExists_ShouldThrowNotFoundException() {
         ItemDto itemDto = ItemDto.builder()
                 .name("itemDto")
@@ -109,6 +112,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи")
     void updateItem_WhenAllUpdateFieldsNotNull_ShouldUpdateNameDescriptionAndAvailable() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -127,6 +131,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи без нового названия")
     void updateItem_WhenAllUpdateDescriptionAndAvailable_ShouldUpdateDescriptionAndAvailable() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -144,7 +149,8 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
-    void updateItem_WhenAllUpdateNameAndDescritpion_ShouldUpdateNameDescription() {
+    @DisplayName("Обновление данных о вещи без статуса доступности")
+    void updateItem_WhenAllUpdateNameAndDescription_ShouldUpdateNameDescription() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
@@ -161,6 +167,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи без нового описания")
     void updateItem_WhenAllUpdateNameAndAvailable_ShouldUpdateNameAndAvailable() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -178,6 +185,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи не владельцем")
     void updateItem_WhenUserIsNotOwner_ShouldThrowNotFoundException() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -193,6 +201,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи, пользователь не найден")
     void updateItem_WhenUserINotFound_ShouldThrowNotFoundException() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -207,6 +216,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи, вещь не найдена")
     void updateItem_WhenItemINotFound_ShouldThrowNotFoundException() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
 
@@ -221,6 +231,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи по id, запрос от владельца")
     void findItemById_WhenRequestByOwner_ShouldReturnItemWithBookings() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
         long itemId = savedItem.getId();
@@ -240,6 +251,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи по id, запрос не от владельца")
     void findItemById_WhenRequestByOtherUser_ShouldReturnItemWithoutBookings() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
         long itemId = savedItem.getId();
@@ -255,6 +267,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя")
     void findAllItemsByUserId_ShouldReturnOwnersItemListWithBookings() {
         long from = 0;
         int size = 4;
@@ -275,6 +288,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя, со 2го элемента")
     void findAllItemsByUserId_WhenFromIs1_ShouldReturnEmptyList() {
         long from = 1;
         int size = 4;
@@ -289,6 +303,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя, у пользователя нет вещей")
     void findAllItemsByUserId_WhenUserNotHaveItems_ShouldReturnEmptyList() {
         long from = 0;
         int size = 4;
@@ -300,6 +315,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей")
     void searchItems_ShouldReturnItemsContainingTextInTitleOrDescription() {
         long from = 0;
         int size = 10;
@@ -314,6 +330,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, со 2го элемента")
     void searchItems_From1_ShouldReturnEmptyList() {
         long from = 1;
         int size = 10;
@@ -326,6 +343,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, верхний регистр")
     void searchItems_TextUpperCase_ShouldReturnItemsContainingTextInTitleOrDescription() {
         long from = 0;
         int size = 10;
@@ -340,6 +358,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, только по описанию")
     void searchItems_SearchOnlyDescription_ShouldReturnItemsContainingTextInTitleOrDescription() {
         long from = 0;
         int size = 10;
@@ -354,6 +373,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, вещь недоступна")
     void searchItems_WhenItemUnavailable_ShouldReturnEmptyList() {
         long from = 1;
         int size = 4;
@@ -371,6 +391,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи")
     void addCommentToItem_ShouldReturnCommentWithNotNullId() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
         setUpBookings(savedItem.getId());
@@ -385,6 +406,7 @@ class ItemServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи, от пользователя не бравшего вещь в аренду")
     void addCommentToItem_WhenUserThatNotBookedItem_ShouldThrowItemUnavailableException() {
         ItemDto savedItem = itemService.addItem(savedUser1.getId(), itemDto);
         setUpBookings(savedItem.getId());

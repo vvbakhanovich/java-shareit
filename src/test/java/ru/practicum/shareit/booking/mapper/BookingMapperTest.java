@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.mapper;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import ru.practicum.shareit.booking.dto.ShortBookingDto;
@@ -24,6 +25,7 @@ class BookingMapperTest {
     }
 
     @Test
+    @DisplayName("Проверка маппинга bookerId")
     void mapBookersIdToBookerId() {
         User booker = User.builder()
                 .id(1L)

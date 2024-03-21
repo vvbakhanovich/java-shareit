@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -42,6 +43,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление пользователя")
     void addUser_ShouldReturnUserWithId() {
         UserDto savedUser = userService.addUser(userDto);
 
@@ -52,6 +54,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных пользователя")
     void updateUser_WithNameAndEmail_ShouldUpdateNameAndEmail() {
         UserDto savedUser = userService.addUser(userDto);
         UserDto updatedUser = userService.updateUser(savedUser.getId(), updateDto);
@@ -62,6 +65,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление email пользователя")
     void updateUser_WithOnlyEmail_ShouldUpdateEmail() {
         updateDto.setName(null);
         UserDto savedUser = userService.addUser(userDto);
@@ -73,6 +77,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление имени пользователя")
     void updateUser_WithOnlyName_ShouldUpdateName() {
         updateDto.setEmail(null);
         UserDto savedUser = userService.addUser(userDto);
@@ -84,6 +89,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Обновление данных пользователя, email и name равны null")
     void updateUser_WithNullEmailAndName_ShouldNotUpdateAnyFields() {
         updateDto.setEmail(null);
         updateDto.setName(null);
@@ -96,6 +102,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск пользователя по id")
     void findUserById_UserFound_ShouldReturnUser() {
         UserDto savedUser = userService.addUser(userDto);
 
@@ -107,6 +114,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск пользователя по id, пользователь не найден")
     void findUserById_UserNotFound_ShouldThrowNotFoundException() {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> userService.findUserById(999L));
@@ -115,6 +123,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск всех пользователей")
     void findAllUsers_ShouldReturnListOfOne() {
         UserDto savedUser = userService.addUser(userDto);
 
@@ -125,6 +134,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск всех пользователей, когда в БД несколько пользователей")
     void findAllUsers_ShouldReturnUserList() {
         UserDto savedUser = userService.addUser(userDto);
         UserDto userDto2 = UserDto.builder()
@@ -140,6 +150,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск всех пользователей, когда в БД нет пользователей")
     void findAllUsers_WithNoUsers_ShouldReturnEmptyList() {
 
         List<UserDto> users = userService.findAllUsers();
@@ -149,6 +160,7 @@ class UserServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Удаление пользователя по id")
     void deleteUserById_UserExits_ShouldDeleteUser() {
         UserDto savedUser = userService.addUser(userDto);
 

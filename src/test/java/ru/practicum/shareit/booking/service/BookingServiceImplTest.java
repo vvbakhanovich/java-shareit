@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -101,6 +102,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования")
     void addBooking_ItemAndUserFound_ShouldReturnBookingDto() {
         AddBookingDto addBookingDto = AddBookingDto.builder()
                 .itemId(itemId)
@@ -130,6 +132,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования, пользователь не найден")
     void addBooking_UserNotFound_ShouldThrowNotFoundException() {
         AddBookingDto addBookingDto = AddBookingDto.builder()
                 .itemId(itemId)
@@ -151,6 +154,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования, вещь не найдена")
     void addBooking_ItemNotFound_ShouldThrowNotFoundException() {
         AddBookingDto addBookingDto = AddBookingDto.builder()
                 .itemId(itemId)
@@ -175,6 +179,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования не владельцем вещи")
     void addBooking_OwnerTryToBookHisItem_ShouldThrowNotAuthorizedException() {
         AddBookingDto addBookingDto = AddBookingDto.builder()
                 .itemId(itemId)
@@ -201,6 +206,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования")
     void acknowledgeBooking_UserAndBookingFoundAndSApprovedTrue_ShouldReturnBookingDto() {
         itemOwner.setId(userId);
         when(userStorage.findById(userId))
@@ -219,6 +225,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Отмена бронирования")
     void acknowledgeBooking_UserAndBookingFoundAndApprovedFalse_ShouldReturnBookingDto() {
         itemOwner.setId(userId);
         when(userStorage.findById(userId))
@@ -237,6 +244,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования с неверным статусом")
     void acknowledgeBooking_UserAndBookingFoundBookingStatusNotWaiting_ShouldThrowItemUnavailableException() {
         itemOwner.setId(userId);
         booking.setStatus(BookingStatus.APPROVED);
@@ -256,6 +264,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, пользователь не найден")
     void acknowledgeBooking_UserNotFound_ShouldThrowNotFoundException() {
         itemOwner.setId(userId);
         when(userStorage.findById(userId))
@@ -272,6 +281,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, бронирование не найдено")
     void acknowledgeBooking_BookingNotFound_ShouldThrowNotFoundException() {
         itemOwner.setId(userId);
         when(userStorage.findById(userId))
@@ -290,6 +300,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, запрос от бронируюущего")
     void getBookingById_RequesterIsBooker() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
@@ -304,6 +315,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, запрос от бронируюущего")
     void getBookingById_RequesterIsItemOwner() {
         when(userStorage.findById(itemOwner.getId()))
                 .thenReturn(Optional.of(new User()));
@@ -318,6 +330,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, неавторизованный запрос")
     void getBookingById_UnauthorizedRequest_ShouldThrowNotAuthorizedException() {
         long unknownUserId = 99L;
         when(userStorage.findById(unknownUserId))
@@ -336,6 +349,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, пользователь не найден")
     void getBookingById_UserNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.empty());
@@ -350,6 +364,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, бронирование не найдено")
     void getBookingById_BookingNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
@@ -366,6 +381,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение всех бронирований от владельца, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateAll_ShouldReturnListOfBookings() {
         GetBookingState state = ALL;
         Long from = 1L;
@@ -389,6 +405,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение текущих бронирований от владельца, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateCurrent_ShouldReturnListOfBookings() {
         GetBookingState state = CURRENT;
         Long from = 1L;
@@ -412,6 +429,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение прошедших бронирований от владельца, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStatePast_ShouldReturnListOfBookings() {
         GetBookingState state = PAST;
         Long from = 1L;
@@ -435,6 +453,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение будущих бронирований от владельца, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateFuture_ShouldReturnListOfBookings() {
         GetBookingState state = FUTURE;
         Long from = 1L;
@@ -458,6 +477,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом WAITING от владельца, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateWaiting_ShouldReturnListOfBookings() {
         GetBookingState state = WAITING;
         Long from = 1L;
@@ -481,6 +501,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом REJECTED от владельца, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsOwnerFromAndSizeAreNotNullStateRejected_ShouldReturnListOfBookings() {
         GetBookingState state = REJECTED;
         Long from = 1L;
@@ -504,6 +525,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение всех бронирований, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateAll_ShouldReturnListOfBookings() {
         GetBookingState state = ALL;
         Long from = 1L;
@@ -527,6 +549,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение текущих бронирований, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateCurrent_ShouldReturnListOfBookings() {
         GetBookingState state = CURRENT;
         Long from = 1L;
@@ -550,6 +573,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение прошедших бронирований, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStatePast_ShouldReturnListOfBookings() {
         GetBookingState state = PAST;
         Long from = 1L;
@@ -573,6 +597,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение будущих бронирований, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateFuture_ShouldReturnListOfBookings() {
         GetBookingState state = FUTURE;
         Long from = 1L;
@@ -596,6 +621,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом WAITING, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateWaiting_ShouldReturnListOfBookings() {
         GetBookingState state = WAITING;
         Long from = 1L;
@@ -619,6 +645,7 @@ class BookingServiceImplTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом REJECTED, начиная с 1го элемента по 2 на странице")
     void getAllBookingsFromUser_RequesterIsNotOwnerFromAndSizeAreNotNullStateRejected_ShouldReturnListOfBookings() {
         GetBookingState state = REJECTED;
         Long from = 1L;

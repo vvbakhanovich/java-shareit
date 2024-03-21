@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request.mapper;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ class ItemRequestMapperTest {
     private ItemRequestMapper itemRequestMapper;
 
     @Test
+    @DisplayName("Маппинг AddItemRequestDto в ItemRequest, проверка даты создания")
     public void mapToModelWithCreatedNotNull() {
         AddItemRequestDto addItemRequestDto = new AddItemRequestDto("description");
 
@@ -36,6 +38,7 @@ class ItemRequestMapperTest {
     }
 
     @Test
+    @DisplayName("Маппинг Item в ItemRequest, проверка id пользователя")
     public void mapToItemRequestDtoWithItem() {
         User requester = User.builder().id(1L).build();
         Item item = Item.builder().id(2L).build();

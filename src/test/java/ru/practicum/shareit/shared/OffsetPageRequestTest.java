@@ -1,5 +1,6 @@
 package ru.practicum.shareit.shared;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Sort;
 
@@ -10,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class OffsetPageRequestTest {
 
     @Test
+    @DisplayName("Получение параметров")
     void sizeAndOffsetReturnParametersShouldBeEqualToConstructorArguments() {
         Long offset = 1L;
         Integer size = 4;
@@ -20,6 +22,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Создание с offset = null")
     void whenOffsetNull_ShouldThrowIllegalArgumentException() {
         Long offset = null;
         Integer size = 4;
@@ -30,6 +33,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Создание с size = null")
     void whenSizeNull_ShouldThrowIllegalArgumentException() {
         Long offset = 1L;
         Integer size = null;
@@ -40,6 +44,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение сортировки по умолчанию")
     void defaultSortShouldBeUnsorted() {
         Long offset = 1L;
         Integer size = 4;
@@ -49,6 +54,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение next")
     void next_ShouldReturnOffsetToBeOffsetPlusSize() {
         Long offset = 1L;
         Integer size = 4;
@@ -60,6 +66,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение hasPrevious, offset > size")
     void hasPrevious_ShouldReturnTrueIfOffsetBiggerThanSize() {
         Long offset = 6L;
         Integer size = 4;
@@ -69,6 +76,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение hasPrevious, offset < size")
     void hasPrevious_ShouldReturnTrueIfOffsetLessThanSize() {
         Long offset = 1L;
         Integer size = 4;
@@ -78,6 +86,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение withPage")
     void withPage_ShouldReturnRequestWithPageOffset() {
         Long offset = 1L;
         Integer size = 4;
@@ -93,6 +102,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение withPage, offset > size")
     void previousOrFirst_WhenOffsetGreaterThanSize_ShouldReturnPrevious() {
         Long offset = 5L;
         Integer size = 4;
@@ -103,6 +113,7 @@ class OffsetPageRequestTest {
     }
 
     @Test
+    @DisplayName("Получение withPage, offset < size")
     void previousOrFirst_WhenOffsetLessThanSize_ShouldReturnFirst() {
         Long offset = 2L;
         Integer size = 4;

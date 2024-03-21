@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление нового запроса")
     void addNewItemRequest_ShouldReturnRequestDto() {
         ItemRequestDto itemRequestDto = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
 
@@ -66,6 +68,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление нового запроса, пользователь не найден")
     void addNewItemRequest_UserNotFound_ShouldThrowNotFoundException() {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> itemRequestService.addNewItemRequest(999L, addItemRequestDto));
@@ -74,6 +77,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск всех запросов пользователя")
     void getAllItemRequestsFromUser_ShouldReturnRequestList() {
         ItemRequestDto itemRequestDto = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
         List<ItemRequestDto> requests = itemRequestService.getAllItemRequestsFromUser(savedUser.getId());
@@ -83,6 +87,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск всех запросов пользователя, пользователь не найден")
     void getAllItemRequestsFromUser_UserNotFound_ShouldThrowNotFoundException() {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> itemRequestService.getAllItemRequestsFromUser(999L));
@@ -91,6 +96,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов")
     @SneakyThrows
     void getAvailableItemRequests_From0Size5_ShouldReturn2Requests() {
         User user2 = User.builder().name("username2").email("test2@email.com").build();
@@ -110,6 +116,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов со 2го элемента")
     @SneakyThrows
     void getAvailableItemRequests_From1Size5_ShouldReturn1Requests() {
         User user2 = User.builder().name("username2").email("test2@email.com").build();
@@ -129,6 +136,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов с 3го элемента")
     void getAvailableItemRequests_From2Size5_ShouldReturnEmptyList() {
         User user2 = User.builder().name("username2").email("test2@email.com").build();
         AddItemRequestDto addItemRequestDto2 = new AddItemRequestDto("description 2");
@@ -146,6 +154,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса по id")
     void getItemRequestById_ShouldReturnItem() {
         ItemRequestDto savedRequest = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
 
@@ -156,6 +165,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса по id, пользователь не найден")
     void getItemRequestById_UserNotFound_ShouldThrowNotFoundException() {
         ItemRequestDto savedRequest = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
 
@@ -166,6 +176,7 @@ class ItemRequestServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса по id, запрос не найден")
     void getItemRequestById_RequestNotFound_ShouldThrowNotFoundException() {
         ItemRequestDto savedRequest = itemRequestService.addNewItemRequest(savedUser.getId(), addItemRequestDto);
 

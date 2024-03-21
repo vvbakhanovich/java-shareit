@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -56,6 +57,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление пользователя")
     @SneakyThrows
     void addUser_ValidUser_ShouldReturnDto() {
         when(userService.addUser(userDto))
@@ -68,6 +70,7 @@ class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
+                .andExpect(jsonPath("$.id", is(userDto.getId())))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
 
@@ -75,6 +78,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление пользователя без email")
     @SneakyThrows
     void addUser_NotValidUser_ShouldThrowMethodArgumentNotValidException() {
         userDto.setEmail(null);
@@ -91,6 +95,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Обновление данных пользователя")
     @SneakyThrows
     void updateUser_ShouldReturnUserDto() {
         UserUpdateDto updateDto = new UserUpdateDto();
@@ -104,12 +109,15 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
+                .andExpect(jsonPath("$.id", is(userDto.getId())))
+                .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
 
         verify(userService, times(1)).updateUser(userId, updateDto);
     }
 
     @Test
+    @DisplayName("Поиск пользователя по id")
     @SneakyThrows
     void getUserById_shouldReturnUserDto() {
         when(userService.findUserById(userId))
@@ -122,28 +130,34 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(userDto)))
+                .andExpect(jsonPath("$.id", is(userDto.getId())))
+                .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
 
         verify(userService, times(1)).findUserById(userId);
     }
 
     @Test
+    @DisplayName("Поиск всех пользователей")
     @SneakyThrows
     void getAllUsers_ShouldReturnListOfUserDto() {
         when(userService.findAllUsers())
                 .thenReturn(List.of(userDto));
 
         mvc.perform(get("/users")
-                .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(objectMapper.writeValueAsString(List.of(userDto))))
-                .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())))
-                .andExpect(jsonPath("$.length()", is(1)));
+                .andExpect(jsonPath("$.length()", is(1)))
+                .andExpect(jsonPath("$.[0].id", is(userDto.getId())))
+                .andExpect(jsonPath("$.[0].name", is(userDto.getName())))
+                .andExpect(jsonPath("$.[0].email", is(userDto.getEmail())));
 
         verify(userService, times(1)).findAllUsers();
     }
 
     @Test
+    @DisplayName("Удаление пользователя по id")
     @SneakyThrows
     void deleteUserById_ShouldReturnOkStatus() {
         mvc.perform(delete("/users/{userId}", userId))

@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,6 +115,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования")
     void addBooking_ShouldReturnBookingDtoWithIdNotNull() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -125,6 +127,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования на собственную вещь")
     void addBooking_WhenOwnerTryToBookHisOwnItem_ShouldThrowNotAuthorizedException() {
         NotAuthorizedException e = assertThrows(NotAuthorizedException.class,
                 () -> bookingService.addBooking(owner.getId(), addBookingDto1));
@@ -133,6 +136,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования, пользователь не найден")
     void addBooking_WhenUserNotExists_ShouldThrowNotFoundException() {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.addBooking(999L, addBookingDto1));
@@ -140,6 +144,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования")
     void acknowledgeBooking_WhenApproved_ShouldReturnBookingDtoWithApprovedStatus() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -150,6 +155,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Отмена бронирования")
     void acknowledgeBooking_WhenRejected_ShouldReturnBookingDtoWithRejectedStatus() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -161,6 +167,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования не владельцем вещи")
     void acknowledgeBooking_WhenNotOwnerTryToApprove_ShouldThrowNotAuthorizedException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -171,6 +178,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования с неверным статусом")
     void acknowledgeBooking_WhenBookingStatusIsNotWaiting_ShouldThrowItemUnavailableException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         bookingService.acknowledgeBooking(owner.getId(), addedBooking.getId(), true);
@@ -181,6 +189,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, пользователь не найден")
     void acknowledgeBooking_WhenUserNotFound_ShouldThrowNotFoundException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -190,6 +199,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, бронирование не найдено")
     void acknowledgeBooking_WhenBookingNotFound_ShouldThrowNotFoundException() {
         NotFoundException e = assertThrows(NotFoundException.class,
                 () -> bookingService.acknowledgeBooking(owner.getId(), 999L, true));
@@ -197,6 +207,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, запрос от владельца")
     void getBookingById_WhenRequestFromOwner_ShouldReturnBookingDto() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -209,6 +220,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, запрос пользователя, делающего бронирование")
     void getBookingById_WhenRequestFromBooker_ShouldReturnBookingDto() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -221,6 +233,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, запрос от другого пользователя")
     void getBookingById_WhenRequestFromAnotherUser_ShouldThrowNotAuthorizedException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         User user3 = User.builder()
@@ -236,6 +249,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирования по id, пользователь не найден")
     void getBookingById_WhenUserNotFound_ShouldThrowNotFoundException() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
 
@@ -245,6 +259,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение всех бронирований от владельца, начиная с 1го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateAllFrom1Size1_ShouldReturnAllBooking() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -257,6 +272,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение всех бронирований, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsBookerStateAllFrom0Size1_ShouldReturnAllBooking() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -270,6 +286,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение текущих бронирований от владельца, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateCurrentFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -282,6 +299,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение текущих бронирований, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsBookerStateCurrentFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -294,6 +312,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение прошедших бронирований от владельца, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsOwnerStatePastFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -307,6 +326,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение прошедших бронирований, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsBookerStatePastFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -320,6 +340,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение будущих бронирований от владельца, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateFutureFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -333,6 +354,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение будущих бронирований, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsBookerStateFutureFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -346,6 +368,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом WAITING от владельца, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateWaitingFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -360,6 +383,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом WAITING, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsBookerStateWaitingFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -374,6 +398,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом REJECTED от владельца, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsOwnerStateRejectedFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);
@@ -388,6 +413,7 @@ class BookingServiceImplIntegrationTest {
     }
 
     @Test
+    @DisplayName("Получение бронирований со статусом REJECTED, начиная с 0го элемента по 1 на странице")
     void getAllBookingsFromUser_WhenRequesterIsBookerStateRejectedFromAnd0Are1_ShouldReturnAllCurrentBookings() {
         BookingDto addedBooking = bookingService.addBooking(booker.getId(), addBookingDto1);
         BookingDto addedBooking2 = bookingService.addBooking(booker.getId(), addBookingDto2);

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.mapper;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import ru.practicum.shareit.item.dto.GetItemDto;
@@ -22,6 +23,7 @@ class ItemMapperTest {
     }
 
     @Test
+    @DisplayName("Маппинг null toDto")
     void toDto_mapNull_ShouldReturnNull() {
         ItemDto dto = itemMapper.toDto(null);
 
@@ -29,6 +31,7 @@ class ItemMapperTest {
     }
 
     @Test
+    @DisplayName("Маппинг null toModel")
     void toModel_mapNull_ShouldReturnNull() {
         Item item = itemMapper.toModel(null);
 
@@ -36,6 +39,7 @@ class ItemMapperTest {
     }
 
     @Test
+    @DisplayName("Маппинг null toWithBookingsDto")
     void toWithBookingsDto_mapNull_ShouldReturnNull() {
         GetItemDto getItemDto = itemMapper.toWithBookingsDto(null);
 
@@ -43,6 +47,7 @@ class ItemMapperTest {
     }
 
     @Test
+    @DisplayName("Маппинг null toWithBookingsDto")
     void toWithBookingsDtoList_mapNull_ShouldReturnNull() {
         List<GetItemDto> getItemDtos = itemMapper.toWithBookingsDtoList(null);
 

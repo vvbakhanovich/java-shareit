@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -65,6 +66,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление пользователя")
     void addUser_ValidUser_ShouldReturnUserDto() {
         when(userMapper.toModel(userDto))
                 .thenReturn(user);
@@ -79,6 +81,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных пользователя")
     void updateUser_UserFoundAndNameNotNullEmailNotNull_ShouldUpdateNameAndEmail() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(user));
@@ -97,6 +100,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных пользователя, пользователь не найден")
     void updateUser_UserNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.empty());
@@ -111,6 +115,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление email пользователя")
     void updateUser_UserFoundAndNameNullEmailNotNull_ShouldUpdateOnlyEmail() {
         updateDto.setName(null);
         when(userStorage.findById(userId))
@@ -130,6 +135,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление имени пользователя")
     void updateUser_UserFoundAndNameNotNullEmailNull_ShouldUpdateOnlyName() {
         updateDto.setEmail(null);
         when(userStorage.findById(userId))
@@ -149,6 +155,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных пользователя, email и name равны null")
     void updateUser_UserFoundAndNameNullEmailNull_ShouldNotUpdateAnyFields() {
         updateDto.setEmail(null);
         updateDto.setName(null);
@@ -180,6 +187,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск пользователя по id")
     void findUserById_UserNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.empty());
@@ -193,6 +201,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск всех пользователей")
     void findAllUsers_ShouldReturnList() {
         when(userStorage.findAll())
                 .thenReturn(List.of(user));
@@ -204,6 +213,7 @@ class UserServiceImplTest {
     }
 
     @Test
+    @DisplayName("Удаление пользователя по id")
     void deleteUserById() {
         userService.deleteUserById(userId);
 

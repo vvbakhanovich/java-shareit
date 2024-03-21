@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -171,6 +172,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи")
     void addItem_UserAndRequestFound_ShouldReturnItemDtoWithOwnerAndRequest() {
         when(userStorage.findById(ownerId))
                 .thenReturn(Optional.of(owner));
@@ -199,6 +201,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи не по запросу")
     void addItem_RequestIdIsNull_ShouldReturnItemDtoWithOwnerAndWithoutRequest() {
         itemDto.setRequestId(null);
         when(userStorage.findById(ownerId))
@@ -221,6 +224,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи, пользователь не найден")
     void addItem_UserNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(ownerId))
                 .thenReturn(Optional.empty());
@@ -237,6 +241,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление вещи по запросу, запрос не найден")
     void addItem_RequestNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(ownerId))
                 .thenReturn(Optional.of(owner));
@@ -257,6 +262,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи")
     void updateItem_WhenAllUpdateFieldsNotNull_ShouldUpdateNameDescriptionAndAvailable() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name("new name")
@@ -284,6 +290,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи без нового названия")
     void updateItem_WhenUpdatedNameIsNull_ShouldUpdateDescriptionAndAvailable() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name(null)
@@ -311,6 +318,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи без нового описания")
     void updateItem_WhenUpdatedDescriptionIsNull_ShouldUpdateNameAndAvailable() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name("new name")
@@ -338,6 +346,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи без статуса доступности")
     void updateItem_WhenUpdatedAvailableIsNull_ShouldUpdateNameAndDescription() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name("new name")
@@ -365,6 +374,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи не владельцем")
     void updateItem_WhenNotOwnerTryToUpdate_ShouldThrowNotFoundException() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name("new name")
@@ -389,6 +399,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи, пользователь не найден")
     void updateItem_WhenUserNotFound_ShouldThrowNotFoundException() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name("new name")
@@ -410,6 +421,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Обновление данных о вещи, вещь не найдена")
     void updateItem_WhenItemNotFound_ShouldThrowNotFoundException() {
         ItemUpdateDto itemUpdateDto = ItemUpdateDto.builder()
                 .name("new name")
@@ -433,6 +445,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи по id, запрос от владельца")
     void findItemById_WhenRequesterIsOwner_ShouldReturnItemWithBookingDates() {
         booking1.setStatus(BookingStatus.APPROVED);
         booking2.setStatus(BookingStatus.APPROVED);
@@ -468,6 +481,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи по id, запрос не от владельца")
     void findItemById_WhenRequesterIsNotOwner_ShouldReturnItemWithoutBookingDates() {
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.of(requester));
@@ -494,6 +508,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи по id, пользователь не найден")
     void findItemById_WhenUserNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.empty());
@@ -512,6 +527,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещи по id, вещб не найдена")
     void findItemById_WhenItemNotFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(requesterId))
                 .thenReturn(Optional.of(requester));
@@ -532,6 +548,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя")
     void findAllItemsByUserId_ShouldReturnItemsWithBookingAndComments() {
         long from = 0;
         int size = 4;
@@ -586,6 +603,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя, следующее бронирование не подтверждено")
     void findAllItemsByUserId_WhenNextBookingsIsNotApproved_ShouldReturnItemsWithBookingAndComments() {
         long from = 0;
         int size = 4;
@@ -639,6 +657,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя, все бронирования не подтверждены")
     void findAllItemsByUserId_WhenBookingsAreNotApproved_ShouldReturnItemsWithNoBookingAndComments() {
         long from = 1;
         int size = 4;
@@ -690,6 +709,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя, бронирований нет")
     void findAllItemsByUserId_WhenNoBookings_ShouldReturnItemsWithoutBookingAndComments() {
         long from = 1;
         int size = 4;
@@ -722,6 +742,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя, пользователь не найден")
     void findAllItemsByUserId_WhenUserNotFound_ShouldThrowNotFoundException() {
         long from = 1;
         int size = 4;
@@ -739,6 +760,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей пользователя")
     void searchItems_WhenTextIsNotBlank_ShouldReturnListOfItems() {
         long from = 1;
         int size = 4;
@@ -759,6 +781,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, верхний регистр")
     void searchItems_WhenTextUpperCase_ShouldReturnListOfItems() {
         long from = 1;
         int size = 4;
@@ -779,6 +802,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, пустой запрос")
     void searchItems_WhenTextIsEmpty_ShouldReturnListOfItems() {
         long from = 1;
         int size = 4;
@@ -792,6 +816,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск вещей, запрос из пробелов")
     void searchItems_WhenTextIsOnlyWhitespaces_ShouldReturnListOfItems() {
         long from = 1;
         int size = 4;
@@ -805,6 +830,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи")
     void addCommentToItem_WhenUserIsAbleToAddComments_ShouldReturnCommentDto() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");
         booking1.setStatus(BookingStatus.APPROVED);
@@ -835,6 +861,7 @@ class ItemServiceImplTest {
 
 
     @Test
+    @DisplayName("Добавление отзыва о вещи, от пользователя не бравшего вещь в аренду")
     void addCommentToItem_WhenUserUnableToAddComments_ShouldThrowItemUnavailableException() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");
         when(userStorage.findById(ownerId))
@@ -857,6 +884,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи, бронирование не подтверждено")
     void addCommentToItem_WhenUserIsAbleToAddCommentsButBookingsNotApproved_ShouldThrowItemUnavailableException() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");
         when(userStorage.findById(requesterId))
@@ -879,6 +907,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи, бронирование не закончилось")
     void addCommentToItem_WhenUserIsAbleToAddCommentsButBookingsHaveNotEnded_ShouldThrowItemUnavailableException() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");
         when(userStorage.findById(requesterId))
@@ -901,6 +930,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи, пользователь не найден")
     void addCommentToItem_WhenUserNotFound_ShouldThrowItemUnavailableException() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");
         when(userStorage.findById(ownerId))
@@ -918,6 +948,7 @@ class ItemServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление отзыва о вещи, вещь не найдена")
     void addCommentToItem_WhenItemNotFound_ShouldThrowItemUnavailableException() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");
         when(userStorage.findById(ownerId))

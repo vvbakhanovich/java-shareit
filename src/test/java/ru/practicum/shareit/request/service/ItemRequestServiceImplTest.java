@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -63,6 +64,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление нового запроса")
     public void addNewItemRequest_ShouldSetRequester() {
         User user = new User();
         String description = "description";
@@ -88,6 +90,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Добавление нового запроса, пользователь не найден")
     public void addNewItemRequest_NoUserFound_ThrowNotFoundException() {
         AddItemRequestDto addItemRequestDto = new AddItemRequestDto();
         when(userStorage.findById(userId))
@@ -103,6 +106,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск всех запросов пользователя, пустой список")
     public void getAllItemRequestsFromUser_ShouldReturnEmptyList() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.of(new User()));
@@ -122,6 +126,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск всех запросов пользователя")
     public void getAllItemRequestsFromUser_ShouldReturnRequestList() {
         ItemRequestDto itemRequestDto = new ItemRequestDto();
         when(userStorage.findById(userId))
@@ -143,6 +148,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск всех запросов пользователя, пользователь не найден")
     public void getAllItemRequestsFromUser_NoUserFound_ShouldThrowNotFoundException() {
         when(userStorage.findById(userId))
                 .thenReturn(Optional.empty());
@@ -158,6 +164,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов, пользователь не найден")
     public void getAvailableItemRequests_UserNotExists_ShouldThrowNotFoundException() {
         Long from = 1L;
         Integer size = 1;
@@ -176,6 +183,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов, from = null")
     public void getAvailableItemRequests_FromNullSizeNotNull_ShouldThrowIllegalArgumentException() {
         Long from = null;
         Integer size = 1;
@@ -193,6 +201,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов, size = null")
     public void getAvailableItemRequests_FromNotNullSizeNull_ShouldThrowIllegalArgumentException() {
         Long from = 1L;
         Integer size = null;
@@ -210,6 +219,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск доступных запросов")
     public void getAvailableItemRequests_WithNotNullFromAndSize_ShouldInvokeFindAllPageable() {
         Long from = 1L;
         Integer size = 2;
@@ -228,6 +238,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса по id, пользователь не найден")
     public void getItemRequestById_UserNotFound_ShouldThrowNotFoundException() {
         long requestId = 1;
 
@@ -243,6 +254,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса по id, запрос не найден")
     public void getItemRequestById_RequestNotFound_ShouldThrowNotFoundException() {
         long requestId = 1;
 
@@ -259,6 +271,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    @DisplayName("Поиск запроса по id")
     public void getItemRequestById_ShouldReturnRequest() {
         long requestId = 1;
         itemRequest.setId(1L);
