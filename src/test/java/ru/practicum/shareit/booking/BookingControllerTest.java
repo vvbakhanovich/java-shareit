@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -73,6 +74,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования")
     @SneakyThrows
     void addNewBooking_ShouldReturnStatus201() {
         when(bookingService.addBooking(userId, addBookingDto))
@@ -84,12 +86,19 @@ class BookingControllerTest {
                         .content(objectMapper.writeValueAsString(addBookingDto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)));
+                .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)))
+                .andExpect(jsonPath("$.id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).addBooking(userId, addBookingDto);
     }
 
     @Test
+    @DisplayName("Добавление бронирования, дата старта в прошлом")
     @SneakyThrows
     void addNewBooking_BookingStartInPast_ShouldThrowMethodArgumentNotValidException() {
         addBookingDto.setStart(LocalDateTime.now().minusDays(1));
@@ -106,6 +115,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования, запрос без заголовка")
     @SneakyThrows
     void addNewBooking_WithoutHeader_ShouldThrowMissingRequestHeaderException() {
 
@@ -119,6 +129,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования, вещь не найдена")
     @SneakyThrows
     void addNewBooking_WhenNotFoundThrown_ShouldReturn404Status() {
         when(bookingService.addBooking(userId, addBookingDto))
@@ -135,22 +146,27 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Добавление бронирования собственной вещи")
     @SneakyThrows
     void addNewBooking_WhenNotAuthorizedThrown_ShouldReturn404() {
+        String errorMessage = "Вещь с id '" + addBookingDto.getItemId() +
+                "' уже принадлежит пользователю с id '" + userId + "'.";
         when(bookingService.addBooking(userId, addBookingDto))
-                .thenThrow(NotAuthorizedException.class);
+                .thenThrow(new NotAuthorizedException(errorMessage));
 
         mvc.perform(post("/bookings")
                         .header(header, userId)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(addBookingDto)))
                 .andExpect(status().isNotFound())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotAuthorizedException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof NotAuthorizedException))
+                .andExpect(jsonPath("$.errors.errorMessage", is(errorMessage)));
 
         verify(bookingService, times(1)).addBooking(userId, addBookingDto);
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования")
     @SneakyThrows
     void acknowledgeBooking_WithAllParams_ShouldReturnStatus200() {
         Long bookingId = 2L;
@@ -163,29 +179,39 @@ class BookingControllerTest {
                         .param("approved", approved.toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)));
+                .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)))
+                .andExpect(jsonPath("$.id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).acknowledgeBooking(userId, bookingId, approved);
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования недоступной вещи")
     @SneakyThrows
     void acknowledgeBooking_WhenItemUnavailableExceptionThrown_ShouldReturn404() {
         Long bookingId = 2L;
         Boolean approved = true;
+        String errorMessage = "Текущий статус бронирования не позволяет сделать подтверждение.";
         when(bookingService.acknowledgeBooking(userId, bookingId, approved))
-                .thenThrow(ItemUnavailableException.class);
+                .thenThrow(new ItemUnavailableException(errorMessage));
 
         mvc.perform(patch("/bookings/{bookingId}", bookingId)
                         .header(header, userId)
                         .param("approved", approved.toString()))
                 .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ItemUnavailableException));
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ItemUnavailableException))
+                .andExpect(jsonPath("$.errors.errorMessage", is(errorMessage)));
 
         verify(bookingService, times(1)).acknowledgeBooking(userId, bookingId, approved);
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, выброшено непредвиденное исключение")
     @SneakyThrows
     void acknowledgeBooking_WhenUnexpectedException_ShouldReturn500() {
         Long bookingId = 2L;
@@ -203,6 +229,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, запрос без заголовка")
     @SneakyThrows
     void acknowledgeBooking_WithoutHeader_ShouldThrowMissingRequestHeaderException() {
         Long bookingId = 2L;
@@ -219,6 +246,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Подтверждение бронирования, запрос без статуса подтверждения")
     @SneakyThrows
     void acknowledgeBooking_WithoutApproved_ShouldThrowMissingServletRequestParameterException() {
         Long bookingId = 2L;
@@ -236,6 +264,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск бронирования по id")
     @SneakyThrows
     void getBookingById_WithAllParameters_ShouldReturnStatus200() {
         Long bookingId = 2L;
@@ -246,12 +275,19 @@ class BookingControllerTest {
                         .header(header, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)));
+                .andExpect(content().string(objectMapper.writeValueAsString(bookingDto)))
+                .andExpect(jsonPath("$.id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).getBookingById(userId, bookingId);
     }
 
     @Test
+    @DisplayName("Поиск бронирования по id, запрос без заголовка")
     @SneakyThrows
     void getBookingById_WithoutHeader_ShouldThrowMissingRequestHeaderException() {
         Long bookingId = 2L;
@@ -264,6 +300,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований пользователя")
     @SneakyThrows
     void getAllBookingsFromUser_WithAllParams_ShouldReturnStatus200() {
         GetBookingState state = GetBookingState.FUTURE;
@@ -280,12 +317,19 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))))
+                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.[0].item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.[0].booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.[0].start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.[0].end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size, isOwner);
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований пользователя с параметрами по умолчанию")
     @SneakyThrows
     void getAllBookingsFromUser_WithoutParams_ShouldReturnStatus200() {
         long from = 0;
@@ -299,13 +343,20 @@ class BookingControllerTest {
                         .header(header, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))))
+                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.[0].item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.[0].booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.[0].start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.[0].end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size,
                 isOwner);
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований пользователя с параметрами")
     @SneakyThrows
     void getAllBookingsFromUser_WithParams_ShouldReturnStatus200() {
         long from = 2;
@@ -321,13 +372,20 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))))
+                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.[0].item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.[0].booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.[0].start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.[0].end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size,
                 isOwner);
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований пользователя, запрос без заголовка")
     @SneakyThrows
     void getAllBookingsFromUser_WithoutHeader_ShouldThrowMissingRequestHeaderException() {
         GetBookingState state = GetBookingState.FUTURE;
@@ -346,6 +404,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований пользователя, неизвестный статус")
     @SneakyThrows
     void getAllBookingsFromUser_UnknownState_ShouldThrowMethodArgumentTypeMismatchException() {
         Long from = 1L;
@@ -364,6 +423,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований вещей пользователя")
     @SneakyThrows
     void getAllOwnerBookings_WithAllParams_ShouldReturnStatus200() {
         GetBookingState state = GetBookingState.FUTURE;
@@ -380,12 +440,19 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))))
+                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.[0].item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.[0].booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.[0].start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.[0].end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size, isOwner);
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований вещей пользователя с параметрами по умолчанию")
     @SneakyThrows
     void getAllOwnerBookings_WithoutParams_ShouldReturnStatus200() {
         Long from = 0L;
@@ -399,13 +466,20 @@ class BookingControllerTest {
                         .header(header, userId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))));
+                .andExpect(content().string(objectMapper.writeValueAsString(List.of(bookingDto))))
+                .andExpect(jsonPath("$.[0].id", is(bookingDto.getId())))
+                .andExpect(jsonPath("$.[0].item", is(bookingDto.getItem())))
+                .andExpect(jsonPath("$.[0].booker", is(bookingDto.getBooker())))
+                .andExpect(jsonPath("$.[0].status", is(bookingDto.getStatus())))
+                .andExpect(jsonPath("$.[0].start", is(bookingDto.getStart())))
+                .andExpect(jsonPath("$.[0].end", is(bookingDto.getEnd())));
 
         verify(bookingService, times(1)).getAllBookingsFromUser(userId, state, from, size,
                 isOwner);
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований вещей пользователя, запрос без заголовка")
     @SneakyThrows
     void getAllOwnerBookings_WithoutHeader_ShouldThrowMissingRequestHeaderException() {
         GetBookingState state = GetBookingState.FUTURE;
@@ -424,6 +498,7 @@ class BookingControllerTest {
     }
 
     @Test
+    @DisplayName("Поиск всех бронирований вещей пользователя, неизвестный статус")
     @SneakyThrows
     void getAllOwnerBookings_UnknownState_ShouldThrowMethodArgumentTypeMismatchException() {
         Long from = 1L;
