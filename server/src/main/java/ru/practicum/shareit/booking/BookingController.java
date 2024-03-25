@@ -28,26 +28,26 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookingDto addNewBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto addNewBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                     @RequestBody AddBookingDto bookingDto) {
         return bookingService.addBooking(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingDto acknowledgeBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto acknowledgeBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                          @PathVariable Long bookingId,
                                          @RequestParam Boolean approved) {
         return bookingService.acknowledgeBooking(userId, bookingId, approved);
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDto getBookingById(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public BookingDto getBookingById(@RequestHeader("X-Sharer-User-Id") long userId,
                                      @PathVariable Long bookingId) {
         return bookingService.getBookingById(userId, bookingId);
     }
 
     @GetMapping
-    public List<BookingDto> getAllBookingsFromUser(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public List<BookingDto> getAllBookingsFromUser(@RequestHeader("X-Sharer-User-Id") long userId,
                                                    @RequestParam GetBookingState state,
                                                    @RequestParam Long from,
                                                    @RequestParam Integer size) {
@@ -55,7 +55,7 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDto> getAllOwnerBookings(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public List<BookingDto> getAllOwnerBookings(@RequestHeader("X-Sharer-User-Id") long userId,
                                                 @RequestParam GetBookingState state,
                                                 @RequestParam Long from,
                                                 @RequestParam Integer size) {

@@ -13,44 +13,43 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ItemController {
 
-    private static final String DEFAULT_PAGE_SIZE = "10";
-
     private final ItemService itemService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestBody ItemDto itemDto) {
+    public ItemDto addItem(@RequestHeader("X-Sharer-User-Id") long userId, @RequestBody ItemDto itemDto) {
         return itemService.addItem(userId, itemDto);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId,
                               @PathVariable long itemId,
                               @RequestBody ItemUpdateDto itemUpdateDto) {
         return itemService.updateItem(userId, itemId, itemUpdateDto);
     }
 
     @GetMapping("/{itemId}")
-    public GetItemDto getItemById(@RequestHeader("X-Sharer-User-Id") Long userId, @PathVariable long itemId) {
+    public GetItemDto getItemById(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
         return itemService.findItemById(userId, itemId);
     }
 
     @GetMapping
-    public List<GetItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                @RequestParam(defaultValue = "0") Long from,
-                                                @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) Integer size) {
+    public List<GetItemDto> getAllItemsByUserId(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                @RequestParam Long from,
+                                                @RequestParam Integer size) {
         return itemService.findAllItemsByUserId(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text,
-                                     @RequestParam(defaultValue = "0") Long from,
-                                     @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) Integer size) {
+    public List<ItemDto> searchItems(@RequestHeader("X-Sharer-User-Id") long userId,
+                                     @RequestParam String text,
+                                     @RequestParam Long from,
+                                     @RequestParam Integer size) {
         return itemService.searchItems(text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto addCommentToItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public CommentDto addCommentToItem(@RequestHeader("X-Sharer-User-Id") long userId,
                                        @PathVariable Long itemId,
                                        @RequestBody AddCommentDto commentDto) {
         return itemService.addCommentToItem(userId, itemId, commentDto);
