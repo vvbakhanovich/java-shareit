@@ -3,6 +3,7 @@ package ru.practicum.shareit.shared.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +44,15 @@ public class ServerExceptionHandler {
     public ErrorResponse handleItemUnavailableException(ConstraintViolationException e) {
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.getErrors().put("errorMessage", e.getLocalizedMessage());
+        log.error(e.getLocalizedMessage());
+        return errorResponse;
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingRequestHeaderException(MissingRequestHeaderException e) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.getErrors().put(e.getHeaderName(), e.getLocalizedMessage());
         log.error(e.getLocalizedMessage());
         return errorResponse;
     }

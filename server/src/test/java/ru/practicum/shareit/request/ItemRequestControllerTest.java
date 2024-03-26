@@ -10,28 +10,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import ru.practicum.shareit.request.dto.AddItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = ItemRequestController.class)
 class ItemRequestControllerTest {
@@ -74,24 +66,6 @@ class ItemRequestControllerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
 
         verify(itemRequestService, never()).addNewItemRequest(any(), any());
-    }
-
-    @Test
-    @DisplayName("Добавление нового запроса, запрос без описания")
-    @SneakyThrows
-    public void addNewItemRequest_NotValidRequestBody_ShouldThrowMethodArgumentNotValidException() {
-        AddItemRequestDto requestDto = new AddItemRequestDto();
-
-        mvc.perform(post("/requests")
-                        .header(header, userId)
-                        .content(objectMapper.writeValueAsString(requestDto))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
-                .andExpect(jsonPath("$.errors.description", is("Описание не может быть пустым.")));
-
-        verify(itemRequestService, never()).addNewItemRequest(eq(userId), any());
     }
 
     @Test
@@ -148,81 +122,6 @@ class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.[0].items", is(itemRequestDto.getItems())));
 
         verify(itemRequestService, times(1)).getAllItemRequestsFromUser(userId);
-    }
-
-
-    @Test
-    @DisplayName("Поиск доступных запросов, запрос без заголовка")
-    @SneakyThrows
-    public void getAvailableItemRequests_NoHeader_ShouldThrowMissingRequestHeaderException() {
-        mvc.perform(get("/requests/all"))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
-
-        verify(itemRequestService, never()).getAvailableItemRequests(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Поиск доступных запросов, from < 0")
-    @SneakyThrows
-    public void getAvailableItemRequests_NegativeFrom_ShouldThrowConstraintViolationException() {
-        mvc.perform(get("/requests/all")
-                        .header(header, userId)
-                        .param("from", "-1")
-                        .param("size", "1"))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
-
-        verify(itemRequestService, never()).getAvailableItemRequests(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Поиск доступных запросов, size < 0")
-    @SneakyThrows
-    public void getAvailableItemRequests_NegativeSize_ShouldThrowConstraintViolationException() {
-        mvc.perform(get("/requests/all")
-                        .header(header, userId)
-                        .param("from", "1")
-                        .param("size", "-14"))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
-
-        verify(itemRequestService, never()).getAvailableItemRequests(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Поиск доступных запросов, size = 0")
-    @SneakyThrows
-    public void getAvailableItemRequests_ZeroSize_ShouldThrowConstraintViolationException() {
-        mvc.perform(get("/requests/all")
-                        .header(header, userId)
-                        .param("from", "1")
-                        .param("size", "0"))
-                .andExpect(status().isBadRequest())
-                .andExpect(result -> assertTrue(result.getResolvedException() instanceof ConstraintViolationException));
-
-        verify(itemRequestService, never()).getAvailableItemRequests(any(), any(), any());
-    }
-
-    @Test
-    @DisplayName("Поиск доступных запросов с параметрами по умолчанию")
-    @SneakyThrows
-    public void getAvailableItemRequests_NotNullFromAndSize_ShouldReturnRequests() {
-        when(itemRequestService.getAvailableItemRequests(userId, 0L, 10))
-                .thenReturn(List.of(itemRequestDto));
-
-        mvc.perform(get("/requests/all")
-                        .header(header, userId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().string(objectMapper.writeValueAsString(List.of(itemRequestDto))))
-                .andExpect(jsonPath("$.length()", is(1)))
-                .andExpect(jsonPath("$.[0].id", is(itemRequestDto.getId())))
-                .andExpect(jsonPath("$.[0].description", is(itemRequestDto.getDescription())))
-                .andExpect(jsonPath("$.[0].created", is(itemRequestDto.getCreated())))
-                .andExpect(jsonPath("$.[0].items", is(itemRequestDto.getItems())));
-
-        verify(itemRequestService, times(1)).getAvailableItemRequests(userId, 0L, 10);
     }
 
     @Test

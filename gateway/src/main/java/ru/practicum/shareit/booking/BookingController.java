@@ -38,7 +38,7 @@ public class BookingController {
     public ResponseEntity<Object> addNewBooking(@RequestHeader("X-Sharer-User-Id") long userId,
                                                 @Valid @RequestBody AddBookingDto bookingDto) {
         log.info("Creating booking {}, userId={}", bookingDto, userId);
-        return bookingClient.bookItem(userId, bookingDto);
+        return bookingClient.addBooking(userId, bookingDto);
     }
 
 

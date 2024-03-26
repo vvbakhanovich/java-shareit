@@ -1,5 +1,6 @@
-package ru.practicum.shareit.validation;
+package validation;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,8 +9,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static ru.practicum.shareit.validation.ValidationTestUtils.VALIDATOR;
-import static ru.practicum.shareit.validation.ValidationTestUtils.dtoHasErrorMessage;
 
 public class UserValidationTest {
 
@@ -22,7 +21,7 @@ public class UserValidationTest {
                 .email("email")
                 .build();
 
-        assertTrue(dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."));
     }
 
     @ParameterizedTest
@@ -35,7 +34,7 @@ public class UserValidationTest {
                 .email(email)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(userDto, "Некорректный формат электронной почты."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(userDto, "Некорректный формат электронной почты."));
     }
 
     @Test
@@ -47,7 +46,7 @@ public class UserValidationTest {
                 .email("email")
                 .build();
 
-        assertTrue(dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."));
     }
 
     @Test
@@ -59,7 +58,7 @@ public class UserValidationTest {
                 .email(null)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(userDto, "Должен быть обязательно указан email."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(userDto, "Должен быть обязательно указан email."));
     }
 
     @Test
@@ -70,7 +69,7 @@ public class UserValidationTest {
                 .name("name")
                 .email("email@test.ru")
                 .build();
-        assertTrue(VALIDATOR.validate(userDto).isEmpty());
+        assertTrue(ValidationTestUtils.VALIDATOR.validate(userDto).isEmpty());
     }
 
     @Test
@@ -83,8 +82,8 @@ public class UserValidationTest {
                 .build();
 
         assertAll(
-                () -> dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."),
-                () -> dtoHasErrorMessage(userDto, "Должен быть обязательно указан email.")
+                () -> ValidationTestUtils.dtoHasErrorMessage(userDto, "Имя пользователя не может быть пустым."),
+                () -> ValidationTestUtils.dtoHasErrorMessage(userDto, "Должен быть обязательно указан email.")
         );
     }
 }

@@ -1,5 +1,6 @@
-package ru.practicum.shareit.validation;
+package validation;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,8 +10,6 @@ import ru.practicum.shareit.item.dto.ItemUpdateDto;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static ru.practicum.shareit.validation.ValidationTestUtils.VALIDATOR;
-import static ru.practicum.shareit.validation.ValidationTestUtils.dtoHasErrorMessage;
 
 public class ItemValidationTest {
 
@@ -25,7 +24,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "Название вещи не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemDto, "Название вещи не может быть пустым."));
     }
 
     @Test
@@ -38,7 +37,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "Название вещи не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemDto, "Название вещи не может быть пустым."));
     }
 
     @Test
@@ -51,7 +50,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(VALIDATOR.validate(itemDto).isEmpty());
+        assertTrue(ValidationTestUtils.VALIDATOR.validate(itemDto).isEmpty());
     }
 
     @ParameterizedTest
@@ -65,7 +64,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."));
     }
 
     @Test
@@ -78,7 +77,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."));
     }
 
     @Test
@@ -90,7 +89,7 @@ public class ItemValidationTest {
                 .description("description")
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности."));
     }
 
     @Test
@@ -103,9 +102,9 @@ public class ItemValidationTest {
                 .build();
 
         assertAll(
-                () -> dtoHasErrorMessage(itemDto, "Название не может быть пустым."),
-                () -> dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."),
-                () -> dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности.")
+                () -> ValidationTestUtils.dtoHasErrorMessage(itemDto, "Название не может быть пустым."),
+                () -> ValidationTestUtils.dtoHasErrorMessage(itemDto, "Описание вещи не может быть пустым."),
+                () -> ValidationTestUtils.dtoHasErrorMessage(itemDto, "У вещи обязательно должен быть указан статус доступности.")
         );
     }
 
@@ -119,7 +118,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemUpdateDto, "Название не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemUpdateDto, "Название не может быть пустым."));
     }
 
     @Test
@@ -131,7 +130,7 @@ public class ItemValidationTest {
                 .available(true)
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemUpdateDto, "Название не может быть пустым."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemUpdateDto, "Название не может быть пустым."));
     }
 
     @Test
@@ -142,6 +141,6 @@ public class ItemValidationTest {
                 .description("description")
                 .build();
 
-        assertTrue(dtoHasErrorMessage(itemUpdateDto, "Не указан статус доступности."));
+        Assertions.assertTrue(ValidationTestUtils.dtoHasErrorMessage(itemUpdateDto, "Не указан статус доступности."));
     }
 }

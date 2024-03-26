@@ -1,4 +1,4 @@
-package ru.practicum.shareit.validation;
+package validation;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,7 @@ import ru.practicum.shareit.booking.dto.AddBookingDto;
 import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static ru.practicum.shareit.validation.ValidationTestUtils.*;
+import static validation.ValidationTestUtils.*;
 
 class AddBookingDtoTest {
 
