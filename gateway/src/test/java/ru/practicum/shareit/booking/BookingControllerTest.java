@@ -46,8 +46,6 @@ class BookingControllerTest {
 
     private AddBookingDto addBookingDto;
 
-
-
     @BeforeEach
     void setUp() {
         userId = 1;
