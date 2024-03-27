@@ -15,6 +15,9 @@ import ru.practicum.shareit.user.dto.UserDto;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,15 +36,12 @@ class UserControllerTest {
 
     private UserDto userDto;
 
-    private long userId;
-
     @BeforeEach
     void setUp() {
         userDto = UserDto.builder()
                 .name("name")
                 .email("test@mail.com")
                 .build();
-        userId = 1;
     }
 
     @Test
@@ -57,6 +57,8 @@ class UserControllerTest {
                 .andExpect(result ->
                         assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
                 .andExpect(jsonPath("$.errors.email", is("Должен быть обязательно указан email.")));
+
+        verify(userClient, never()).addUser(any(UserDto.class));
     }
 
 }

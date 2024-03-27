@@ -38,16 +38,12 @@ class ItemRequestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private AddItemRequestDto addItemRequestDto;
-
-
     private String header;
 
     private Long userId;
 
     @BeforeEach
     public void setUp() {
-        addItemRequestDto = new AddItemRequestDto("description");
         header = "X-Sharer-User-id";
         userId = 1L;
     }

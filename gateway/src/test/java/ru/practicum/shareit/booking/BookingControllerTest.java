@@ -20,6 +20,9 @@ import java.time.LocalDateTime;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -69,6 +72,8 @@ class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
                 .andExpect(jsonPath("$.errors.addBookingDto", is("Задан некорректный интервал бронирования.")));
+
+        verify(bookingClient, never()).addBooking(anyLong(), any(AddBookingDto.class));
     }
 
     @Test
@@ -81,6 +86,8 @@ class BookingControllerTest {
                         .content(objectMapper.writeValueAsString(addBookingDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(bookingClient, never()).addBooking(anyLong(), any(AddBookingDto.class));
     }
 
     @Test
@@ -95,6 +102,8 @@ class BookingControllerTest {
                         .param("approved", approved.toString()))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(bookingClient, never()).acknowledgeBooking(anyLong(), anyLong(), anyBoolean());
     }
 
     @Test
@@ -108,6 +117,8 @@ class BookingControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException()
                         instanceof MissingServletRequestParameterException));
+
+        verify(bookingClient, never()).acknowledgeBooking(anyLong(), anyLong(), anyBoolean());
     }
 
     @Test
@@ -119,6 +130,8 @@ class BookingControllerTest {
         mvc.perform(get("/bookings/{bookingId}", bookingId))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(bookingClient, never()).getBooking(anyLong(), any());
     }
 
     @Test
@@ -135,6 +148,8 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(bookingClient, never()).getBookings(anyLong(), any(GetBookingState.class), anyLong(), anyInt());
     }
 
     @Test
@@ -151,6 +166,8 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentTypeMismatchException));
+
+        verify(bookingClient, never()).getBookings(anyLong(), any(GetBookingState.class), anyLong(), anyInt());
     }
 
     @Test
@@ -167,6 +184,8 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(bookingClient, never()).getOwnerBookings(anyLong(), any(GetBookingState.class), anyLong(), anyInt());
     }
 
     @Test
@@ -183,5 +202,7 @@ class BookingControllerTest {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MethodArgumentTypeMismatchException));
+
+        verify(bookingClient, never()).getOwnerBookings(anyLong(), any(GetBookingState.class), anyLong(), anyInt());
     }
 }

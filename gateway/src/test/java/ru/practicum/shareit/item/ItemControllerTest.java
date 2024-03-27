@@ -99,6 +99,8 @@ class ItemControllerTest {
                         .content(objectMapper.writeValueAsString(itemUpdateDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(itemClient, never()).updateItem(anyLong(), anyLong(), any(ItemUpdateDto.class));
     }
 
     @Test
@@ -108,6 +110,8 @@ class ItemControllerTest {
         mvc.perform(get("/items/{itemId}", itemId))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof MissingRequestHeaderException));
+
+        verify(itemClient, never()).findItemById(anyLong(), anyLong());
     }
 
     @Test
