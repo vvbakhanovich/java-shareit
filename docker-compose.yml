@@ -23,7 +23,6 @@ services:
       - POSTGRES_DB=shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-      - TZ=Europe/Moscow
 
   db:
     image: postgres:13.7-alpine
