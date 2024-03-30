@@ -19,80 +19,85 @@ public class BaseClient {
         this.rest = rest;
     }
 
-    protected ResponseEntity<Object> get(String path) {
-        return get(path, null, null);
+    protected <S> S get(String path, Class<S> returnType) {
+        return get(path, null, null, returnType);
     }
 
-    protected ResponseEntity<Object> get(String path, long userId) {
-        return get(path, userId, null);
+    protected <S> S get(String path, long userId, Class<S> returnType) {
+        return get(path, userId, null, returnType);
     }
 
-    protected ResponseEntity<Object> get(String path, Long userId, @Nullable Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.GET, path, userId, parameters, null);
+    protected <S> S get(String path, Long userId, @Nullable Map<String, Object> parameters,
+                        Class<S> returnType) {
+        return makeAndSendRequest(HttpMethod.GET, path, userId, parameters, null, returnType);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, T body) {
-        return post(path, null, null, body);
+    protected <T, S> S post(String path, T body, Class<S> returnType) {
+        return post(path, null, null, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, long userId, T body) {
-        return post(path, userId, null, body);
+    protected <T, S> S post(String path, long userId, T body, Class<S> returnType) {
+        return post(path, userId, null, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> post(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, userId, parameters, body);
+    protected <T, S> S post(String path, Long userId, @Nullable Map<String, Object> parameters, T body,
+                            Class<S> returnType) {
+        return makeAndSendRequest(HttpMethod.POST, path, userId, parameters, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> put(String path, long userId, T body) {
-        return put(path, userId, null, body);
+    protected <T, S> S put(String path, long userId, T body, Class<S> returnType) {
+        return put(path, userId, null, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> put(String path, long userId, @Nullable Map<String, Object> parameters, T body) {
-        return makeAndSendRequest(HttpMethod.PUT, path, userId, parameters, body);
+    protected <T, S> S put(String path, long userId, @Nullable Map<String, Object> parameters, T body,
+                           Class<S> returnType) {
+        return makeAndSendRequest(HttpMethod.PUT, path, userId, parameters, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> patch(String path, T body) {
-        return patch(path, null, null, body);
+    protected <T, S> S patch(String path, T body, Class<S> returnType) {
+        return patch(path, null, null, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> patch(String path, long userId) {
-        return patch(path, userId, null, null);
+    protected  <S> S patch(String path, long userId, Class<S> returnType) {
+        return patch(path, userId, null, null, returnType);
     }
 
-    protected <T> ResponseEntity<Object> patch(String path, long userId, T body) {
-        return patch(path, userId, null, body);
+    protected <T, S> S patch(String path, long userId, T body, Class<S> returnType) {
+        return patch(path, userId, null, body, returnType);
     }
 
-    protected <T> ResponseEntity<Object> patch(String path, Long userId, @Nullable Map<String, Object> parameters, T body) {
-        return makeAndSendRequest(HttpMethod.PATCH, path, userId, parameters, body);
+    protected <T, S> S patch(String path, Long userId, @Nullable Map<String, Object> parameters, T body,
+                                               Class<S> returnType) {
+        return makeAndSendRequest(HttpMethod.PATCH, path, userId, parameters, body, returnType);
     }
 
-    protected ResponseEntity<Object> delete(String path) {
-        return delete(path, null, null);
+    protected void delete(String path) {
+        delete(path, null, null);
     }
 
-    protected ResponseEntity<Object> delete(String path, long userId) {
-        return delete(path, userId, null);
+    protected void delete(String path, long userId) {
+        delete(path, userId, null);
     }
 
-    protected ResponseEntity<Object> delete(String path, Long userId, @Nullable Map<String, Object> parameters) {
-        return makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null);
+    protected void delete(String path, Long userId, @Nullable Map<String, Object> parameters) {
+        makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null, null);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, Long userId, @Nullable Map<String, Object> parameters, @Nullable T body) {
+    private <T, S> S makeAndSendRequest(HttpMethod method, String path, Long userId,
+                                        @Nullable Map<String, Object> parameters, @Nullable T body, Class<S> returnType) {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
 
-        ResponseEntity<Object> shareitServerResponse;
+        ResponseEntity<S> shareitServerResponse;
         try {
             if (parameters != null) {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
+                shareitServerResponse = rest.exchange(path, method, requestEntity, returnType, parameters);
             } else {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class);
+                shareitServerResponse = rest.exchange(path, method, requestEntity, returnType);
             }
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            throw e;
         }
-        return prepareGatewayResponse(shareitServerResponse);
+        return removeHeadersIfStatusNot2xx(shareitServerResponse).getBody();
     }
 
     private HttpHeaders defaultHeaders(Long userId) {
@@ -105,7 +110,7 @@ public class BaseClient {
         return headers;
     }
 
-    private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
+    private static <S> ResponseEntity<S> removeHeadersIfStatusNot2xx(ResponseEntity<S> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }

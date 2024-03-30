@@ -8,11 +8,7 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingStorage;
-import ru.practicum.shareit.item.dto.AddCommentDto;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.GetItemDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemUpdateDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
@@ -29,12 +25,7 @@ import ru.practicum.shareit.user.storage.UserStorage;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -162,9 +153,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> searchItems(final String text, Long from, Integer size) {
         log.info("Поиск вещей по запросу: {}.", text);
-        if (text.isBlank()) {
-            return Collections.emptyList();
-        }
         String searchText = "%" + text.toLowerCase() + "%";
         OffsetPageRequest pageRequest = OffsetPageRequest.of(from, size);
         final Iterable<Item> searchResult = itemStorage.searchInTitleAndDescription(searchText, pageRequest);

@@ -2,13 +2,14 @@ package ru.practicum.shareit.user;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserUpdateDto;
+
+import java.util.List;
 
 @Service
 public class UserClient extends BaseClient {
@@ -24,23 +25,23 @@ public class UserClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addUser(UserDto userDto) {
-        return post("", userDto);
+    public UserDto addUser(UserDto userDto) {
+        return post("", userDto, UserDto.class);
     }
 
-    public ResponseEntity<Object> updateUser(long userId, UserUpdateDto userUpdateDto) {
-        return patch("/" + userId, userUpdateDto);
+    public UserDto updateUser(long userId, UserUpdateDto userUpdateDto) {
+        return patch("/" + userId, userUpdateDto, UserDto.class);
     }
 
-    public ResponseEntity<Object> findUserById(long userId) {
-        return get("/" + userId);
+    public UserDto findUserById(long userId) {
+        return get("/" + userId, UserDto.class);
     }
 
-    public ResponseEntity<Object> findAllUsers() {
-        return get("");
+    public List<UserDto> findAllUsers() {
+        return get("", List.class);
     }
 
-    public ResponseEntity<Object> deleteUserById(long userId) {
-        return delete("/" + userId);
+    public void deleteUserById(long userId) {
+        delete("/" + userId);
     }
 }

@@ -17,10 +17,12 @@ import ru.practicum.shareit.item.dto.AddCommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ItemController.class)
@@ -148,6 +150,32 @@ class ItemControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof
                         MissingServletRequestParameterException));
+
+        verify(itemClient, never()).searchItems(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Поиск вещей, пустая строка")
+    @SneakyThrows
+    void searchItems_TextIsEmpty_ShouldRetrunEmptyCollection() {
+        mvc.perform(get("/items/search")
+                        .header(header, userId)
+                        .param("text", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(0)));
+
+        verify(itemClient, never()).searchItems(any(), any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("Поиск вещей, строка из пробелов")
+    @SneakyThrows
+    void searchItems_TextIsOnlyBlancs_ShouldRetrunEmptyCollection() {
+        mvc.perform(get("/items/search")
+                        .header(header, userId)
+                        .param("text", "   "))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(0)));
 
         verify(itemClient, never()).searchItems(any(), any(), any(), any());
     }

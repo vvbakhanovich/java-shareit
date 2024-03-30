@@ -802,34 +802,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    @DisplayName("Поиск вещей, пустой запрос")
-    void searchItems_WhenTextIsEmpty_ShouldReturnListOfItems() {
-        long from = 1;
-        int size = 4;
-        String text = "";
-
-        List<ItemDto> items = itemService.searchItems(text, from, size);
-
-        assertThat(items, is(Collections.emptyList()));
-        verify(itemStorage, never()).searchInTitleAndDescription(any(), any());
-        verify(itemMapper, never()).toDtoList(any());
-    }
-
-    @Test
-    @DisplayName("Поиск вещей, запрос из пробелов")
-    void searchItems_WhenTextIsOnlyWhitespaces_ShouldReturnListOfItems() {
-        long from = 1;
-        int size = 4;
-        String text = "   ";
-
-        List<ItemDto> items = itemService.searchItems(text, from, size);
-
-        assertThat(items, is(Collections.emptyList()));
-        verify(itemStorage, never()).searchInTitleAndDescription(any(), any());
-        verify(itemMapper, never()).toDtoList(any());
-    }
-
-    @Test
     @DisplayName("Добавление отзыва о вещи")
     void addCommentToItem_WhenUserIsAbleToAddComments_ShouldReturnCommentDto() {
         AddCommentDto addCommentDto = new AddCommentDto("new comment");

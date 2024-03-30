@@ -2,13 +2,14 @@ package ru.practicum.shareit.request;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.request.dto.AddItemRequestDto;
+import ru.practicum.shareit.request.dto.ItemRequestDto;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -25,23 +26,23 @@ public class ItemRequestClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> addNewItemRequest(Long userId, AddItemRequestDto addItemRequestDto) {
-        return post("", userId, addItemRequestDto);
+    public ItemRequestDto addNewItemRequest(Long userId, AddItemRequestDto addItemRequestDto) {
+        return post("", userId, addItemRequestDto, ItemRequestDto.class);
     }
 
-    public ResponseEntity<Object> getAllItemRequestsFromUser(Long userId) {
-        return get("", userId);
+    public List<ItemRequestDto> getAllItemRequestsFromUser(Long userId) {
+        return get("", userId, List.class);
     }
 
-    public ResponseEntity<Object> getAvailableItemRequests(Long userId, Long from, Integer size) {
+    public List<ItemRequestDto> getAvailableItemRequests(Long userId, Long from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "from", from,
                 "size", size
         );
-        return get("/all?from={from}&size={size}", userId, parameters);
+        return get("/all?from={from}&size={size}", userId, parameters, List.class);
     }
 
-    public ResponseEntity<Object> getItemRequestById(Long userId, Long requestId) {
-        return get("/" + requestId, userId);
+    public ItemRequestDto getItemRequestById(Long userId, Long requestId) {
+        return get("/" + requestId, userId, ItemRequestDto.class);
     }
 }
