@@ -10,13 +10,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.shared.ControllerConstants.DEFAULT_PAGE_SIZE;
+
 @RestController
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 @Validated
 public class ItemRequestController {
-
-    private static final String DEFAULT_PAGE_SIZE = "10";
 
     private final ItemRequestClient itemRequestClient;
 

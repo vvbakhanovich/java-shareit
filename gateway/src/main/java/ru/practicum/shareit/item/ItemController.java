@@ -12,13 +12,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import static ru.practicum.shareit.shared.ControllerConstants.DEFAULT_PAGE_SIZE;
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 @Validated
 public class ItemController {
-
-    private static final String DEFAULT_PAGE_SIZE = "10";
 
     private final ItemClient itemClient;
 
@@ -49,16 +49,16 @@ public class ItemController {
 
     @GetMapping("/search")
     public ResponseEntity<Object> searchItems(@RequestHeader("X-Sharer-User-Id") long userId,
-                                     @RequestParam String text,
-                                     @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
-                                     @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @Positive Integer size) {
+                                              @RequestParam String text,
+                                              @RequestParam(defaultValue = "0") @PositiveOrZero Long from,
+                                              @RequestParam(defaultValue = DEFAULT_PAGE_SIZE) @Positive Integer size) {
         return itemClient.searchItems(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> addCommentToItem(@RequestHeader("X-Sharer-User-Id") long userId,
-                                       @PathVariable Long itemId,
-                                       @RequestBody @Valid AddCommentDto commentDto) {
+                                                   @PathVariable Long itemId,
+                                                   @RequestBody @Valid AddCommentDto commentDto) {
         return itemClient.addCommentToItem(userId, itemId, commentDto);
     }
 }
