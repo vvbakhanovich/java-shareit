@@ -58,7 +58,7 @@ public class BaseClient {
         return patch(path, null, null, body, returnType);
     }
 
-    protected  <S> S patch(String path, long userId, Class<S> returnType) {
+    protected <S> S patch(String path, long userId, Class<S> returnType) {
         return patch(path, userId, null, null, returnType);
     }
 
@@ -67,7 +67,7 @@ public class BaseClient {
     }
 
     protected <T, S> S patch(String path, Long userId, @Nullable Map<String, Object> parameters, T body,
-                                               Class<S> returnType) {
+                             Class<S> returnType) {
         return makeAndSendRequest(HttpMethod.PATCH, path, userId, parameters, body, returnType);
     }
 
@@ -88,14 +88,11 @@ public class BaseClient {
         HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders(userId));
 
         ResponseEntity<S> shareitServerResponse;
-        try {
-            if (parameters != null) {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, returnType, parameters);
-            } else {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, returnType);
-            }
-        } catch (HttpStatusCodeException e) {
-            throw e;
+
+        if (parameters != null) {
+            shareitServerResponse = rest.exchange(path, method, requestEntity, returnType, parameters);
+        } else {
+            shareitServerResponse = rest.exchange(path, method, requestEntity, returnType);
         }
         return removeHeadersIfStatusNot2xx(shareitServerResponse).getBody();
     }
