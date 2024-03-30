@@ -75,7 +75,7 @@ public class BaseClient {
     }
 
     protected void delete(String path, Long userId, @Nullable Map<String, Object> parameters) {
-        makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null, null);
+        makeAndSendRequest(HttpMethod.DELETE, path, userId, parameters, null, Void.class);
     }
 
     private <T, S> S makeAndSendRequest(HttpMethod method, String path, Long userId,
