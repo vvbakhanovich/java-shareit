@@ -89,7 +89,7 @@ public class BaseClient {
         } else {
             shareitServerResponse = rest.exchange(path, method, requestEntity, returnType);
         }
-        return removeHeadersIfStatusNot2xx(shareitServerResponse).getBody();
+        return shareitServerResponse.getBody();
     }
 
     private HttpHeaders defaultHeaders(Long userId) {
@@ -100,19 +100,5 @@ public class BaseClient {
             headers.set("X-Sharer-User-Id", String.valueOf(userId));
         }
         return headers;
-    }
-
-    private static <S> ResponseEntity<S> removeHeadersIfStatusNot2xx(ResponseEntity<S> response) {
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return response;
-        }
-
-        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-
-        if (response.hasBody()) {
-            return responseBuilder.body(response.getBody());
-        }
-
-        return responseBuilder.build();
     }
 }
