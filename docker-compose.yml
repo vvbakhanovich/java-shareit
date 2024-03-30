@@ -17,7 +17,6 @@ services:
       - "9090:9090"
     depends_on:
       - "db"
-      - "gateway"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - POSTGRES_DB=shareit
