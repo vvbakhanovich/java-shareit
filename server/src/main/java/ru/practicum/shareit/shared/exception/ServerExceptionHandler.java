@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.Arrays;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @RestControllerAdvice
 @Slf4j
@@ -63,12 +64,15 @@ public class ServerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleAllException(Exception e) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.getErrors().put(e.getLocalizedMessage(), getStackTraceAsString(e));
+        errorResponse.getErrors().put("errorMessage: " + e.getMessage(), "stackTrace: " + getStackTraceAsString(e));
         log.error(e.getLocalizedMessage());
         return errorResponse;
     }
 
     private String getStackTraceAsString(Exception e) {
-        return Arrays.toString(e.getStackTrace());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 }
