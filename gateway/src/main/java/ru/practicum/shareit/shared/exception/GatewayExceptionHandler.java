@@ -87,7 +87,8 @@ public class GatewayExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleAllException(Exception e) {
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.getErrors().put("errorMessage: " + e.getMessage(), "stackTrace: " + getStackTraceAsString(e));
+        errorResponse.getErrors().put("errorMessage", e.getLocalizedMessage());
+        errorResponse.getErrors().put("stackTrace", getStackTraceAsString(e));
         log.error(e.getLocalizedMessage());
         return errorResponse;
     }
